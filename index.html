@@ -20,12 +20,12 @@
 
   /* ─── TABLET LANDSCAPE: fixed full-screen ─── */
   @media (min-width:900px) and (orientation:landscape) {
-    html,body{height:100%;overflow:hidden;}
-    .layout{display:flex;flex-direction:column;width:100vw;height:100vh;}
+    html,body{height:100%;overflow-y:auto;}
+    .layout{display:flex;flex-direction:column;width:100vw;min-height:100vh;}
     .sales-zone{flex:1;min-height:0;display:flex;}
-    .panel{flex:1;display:flex;flex-direction:column;padding:18px 26px 14px;gap:11px;overflow:hidden;}
+    .panel{flex:1;display:flex;flex-direction:column;padding:18px 26px 14px;gap:11px;overflow:visible;}
     .big-num .amt{font-size:72px;}
-    .clock-zone{height:26vh;flex-shrink:0;}
+    .clock-zone{min-height:220px;flex-shrink:0;}
   }
 
   /* ─── MOBILE / PORTRAIT: scrollable stack ─── */
@@ -47,7 +47,7 @@
   }
 
   /* ─── SHARED STYLES ─── */
-  .layout{overflow:hidden;}
+  .layout{overflow:visible;}
   .topbar{height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
   .brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;letter-spacing:1px;}
   .brand span{color:var(--gold);}
