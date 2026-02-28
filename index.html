@@ -468,15 +468,17 @@ function renderDash(d){
   totalTier("tt2Bar","tt2Pct","tt2Tgt","tt2BonusPct","tt2Badge",ts,tt2,p2);
   totalTier("tt3Bar","tt3Pct","tt3Tgt","tt3BonusPct","tt3Badge",ts,tt3,p3);
 
-  // Overall Comm auto-calculated
-  var activePct=0;
-  if(p3&&ts>=tt3) activePct=p3;
-  else if(p2&&ts>=tt2) activePct=p2;
-  else if(p1&&ts>=tt1) activePct=p1;
-  var calcComm=activePct?Math.round(ts*activePct/100):0;
-  animN(document.getElementById("overallComm"),calcComm);
-  document.getElementById("overallPctRow").textContent=
-    activePct?activePct+"% × RM "+ts.toLocaleString():"Hit a TT tier to earn";
+  // Overall Comm: base 0.5% always, unlocked TT tiers upgrade the rate
+  var BASE_PCT = 0.5;
+  var activePct = BASE_PCT;  // minimum always 0.5%
+  var tierLabel = BASE_PCT + "% (base)";
+  if(p3 && ts>=tt3)      { activePct=p3; tierLabel=p3+"% (TT3 unlocked)"; }
+  else if(p2 && ts>=tt2) { activePct=p2; tierLabel=p2+"% (TT2 unlocked)"; }
+  else if(p1 && ts>=tt1) { activePct=p1; tierLabel=p1+"% (TT1 unlocked)"; }
+  var calcComm = ts ? Math.round(ts * activePct / 100) : 0;
+  animN(document.getElementById("overallComm"), calcComm);
+  document.getElementById("overallPctRow").textContent =
+    ts ? tierLabel + " × RM " + ts.toLocaleString() : "—";
 }
 
 function renderEmps(emps){
