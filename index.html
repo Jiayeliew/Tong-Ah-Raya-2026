@@ -475,8 +475,9 @@ function renderDash(d){
   if(p3 && ts>=tt3)      { activePct=p3; tierLabel=p3+"% (TT3 unlocked)"; }
   else if(p2 && ts>=tt2) { activePct=p2; tierLabel=p2+"% (TT2 unlocked)"; }
   else if(p1 && ts>=tt1) { activePct=p1; tierLabel=p1+"% (TT1 unlocked)"; }
-  var calcComm = ts ? Math.round(ts * activePct / 100) : 0;
-  animN(document.getElementById("overallComm"), calcComm);
+  var calcComm = ts ? parseFloat((ts * activePct / 100).toFixed(2)) : 0;
+  // Display with 2 decimal places
+  document.getElementById("overallComm").textContent = calcComm.toLocaleString("en-MY", {minimumFractionDigits:2, maximumFractionDigits:2});
   document.getElementById("overallPctRow").textContent =
     ts ? tierLabel + " × RM " + ts.toLocaleString() : "—";
 }
