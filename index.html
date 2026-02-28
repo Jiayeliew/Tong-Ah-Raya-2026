@@ -659,7 +659,11 @@ function saveSettings(){
   saveCFG(); startAutoSync(); closeModal(); showToast("Saved","ok");
 }
 
-loadCFG(); tick(); setInterval(tick,1000); startAutoSync();
+// Default URL hardcoded — no setup needed on any device
+var DEFAULT_URL = "https://script.google.com/macros/s/AKfycbwPPUwoUggxLUfHie6Ao0iQCSPqitzm0G_hCojjpedB5-4MBq5FDN6eTZ98DtyqIHDL/exec";
+loadCFG();
+if (!CFG.sheetUrl) { CFG.sheetUrl = DEFAULT_URL; saveCFG(); }
+tick(); setInterval(tick,1000); startAutoSync();
 </script>
 </body>
 </html>
