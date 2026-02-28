@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Tong Ah Raya 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -16,17 +16,45 @@
     --amber:#d97706; --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-border:#c4b5fd;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
-  .layout{display:flex;flex-direction:column;width:100vw;height:100vh;}
+  html,body{width:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
 
-  /* ── Top bar ── */
-  .topbar{height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:var(--bg);border-bottom:1px solid var(--border);}
-  .brand{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;letter-spacing:1px;}
+  /* ─── TABLET LANDSCAPE: fixed full-screen ─── */
+  @media (min-width:900px) and (orientation:landscape) {
+    html,body{height:100%;overflow:hidden;}
+    .layout{display:flex;flex-direction:column;width:100vw;height:100vh;}
+    .sales-zone{flex:1;min-height:0;display:flex;}
+    .panel{flex:1;display:flex;flex-direction:column;padding:18px 26px 14px;gap:11px;overflow:hidden;}
+    .big-num .amt{font-size:72px;}
+    .clock-zone{height:26vh;flex-shrink:0;}
+  }
+
+  /* ─── MOBILE / PORTRAIT: scrollable stack ─── */
+  @media not ((min-width:900px) and (orientation:landscape)) {
+    .layout{display:flex;flex-direction:column;width:100%;}
+    .sales-zone{flex-direction:column;}
+    .panel{padding:18px 16px 14px;gap:10px;}
+    .panel-daily{border-right:none!important;border-bottom:1px solid var(--border);}
+    .big-num .amt{font-size:52px;}
+    .clock-zone{flex-wrap:wrap;height:auto;}
+    .cam-wrap{width:100%!important;height:180px;border-right:none!important;border-bottom:1px solid var(--border);}
+    .emp-section{width:100%;border-right:none!important;border-bottom:1px solid var(--border);}
+    .punch-section{width:50%!important;border-bottom:1px solid var(--border);}
+    .feed-section{width:50%;border-bottom:1px solid var(--border);}
+    .settings-col{width:100%!important;border-left:none!important;border-top:1px solid var(--border);flex-direction:row!important;justify-content:center;padding:8px;}
+    .settings-btn{writing-mode:horizontal-tb!important;letter-spacing:2px;}
+    .tier-right{width:auto!important;}
+    .comm-chip,.bonus-chip{min-width:unset;}
+  }
+
+  /* ─── SHARED STYLES ─── */
+  .layout{overflow:hidden;}
+  .topbar{height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+  .brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;letter-spacing:1px;}
   .brand span{color:var(--gold);}
-  .tb-clock{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;letter-spacing:2px;}
-  .tb-right{display:flex;align-items:center;gap:12px;}
-  .tb-date{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.5px;}
-  .sync-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--border2);cursor:pointer;transition:all .15s;user-select:none;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;}
+  .tb-clock{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;letter-spacing:2px;}
+  .tb-right{display:flex;align-items:center;gap:10px;}
+  .tb-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+  .sync-pill{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;background:var(--surface2);border:1px solid var(--border2);cursor:pointer;transition:all .15s;user-select:none;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;}
   .sync-pill:hover{border-color:#aaa;color:var(--text);}
   .sync-pill:active{transform:scale(.97);}
   .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted2);flex-shrink:0;transition:background .3s;}
@@ -37,52 +65,41 @@
   .setup-icon{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px;transition:color .15s;}
   .setup-icon:hover{color:var(--text);}
 
-  /* ── Sales zone ── */
-  .sales-zone{flex:1;min-height:0;display:flex;}
-  .panel{flex:1;display:flex;flex-direction:column;padding:18px 26px 14px;gap:11px;overflow:hidden;}
+  .sales-zone{display:flex;}
+  .panel{display:flex;flex-direction:column;gap:11px;}
   .panel-daily{border-right:1px solid var(--border);}
   .sec-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+  .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 
-  .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
-
-  /* Big sales number + update btn */
-  .sales-row{display:flex;align-items:flex-end;gap:12px;}
+  .sales-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;}
   .big-num{display:flex;align-items:flex-end;gap:3px;line-height:1;}
-  .big-num .cur{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;padding-bottom:9px;color:var(--gold);}
+  .big-num .cur{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;padding-bottom:8px;color:var(--gold);}
   .big-num .cur.blue{color:var(--blue);}
-  .big-num .amt{font-family:'Playfair Display',serif;font-size:76px;font-weight:900;letter-spacing:-3px;color:var(--text);}
-  .update-btn{margin-bottom:10px;padding:7px 14px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+  .big-num .amt{font-family:'Playfair Display',serif;font-weight:900;letter-spacing:-2px;color:var(--text);}
+
+  .update-btn{margin-bottom:8px;padding:7px 14px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
   .update-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-bg);}
 
-  /* ── Daily Bonus chip ── */
-  .bonus-chip{
-    background:var(--gold-bg);border:1px solid var(--gold-border);
-    border-radius:12px;padding:10px 14px;
-    display:flex;flex-direction:column;gap:4px;
-    flex-shrink:0;min-width:160px;
-  }
-  .bonus-chip-top{display:flex;align-items:center;gap:12px;}
+  .bonus-chip{background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;flex-shrink:0;min-width:155px;}
   .bonus-chip-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:2px;}
-  .bonus-chip-amt{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--gold);line-height:1;}
-  .bonus-chip-amt .rm{font-size:13px;margin-right:1px;}
-  /* Total bonus row below */
+  .bonus-chip-top{display:flex;align-items:center;gap:10px;}
+  .bonus-chip-amt{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--gold);line-height:1;}
+  .bonus-chip-amt .rm{font-size:12px;margin-right:1px;}
   .bonus-total-row{display:flex;align-items:center;gap:6px;padding-top:4px;border-top:1px solid var(--gold-border);}
   .bonus-total-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--gold);opacity:.7;}
   .bonus-total-amt{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--gold);}
 
-  /* Overall comm chip (right panel) */
   .overall-chip{text-align:right;flex-shrink:0;}
-  .overall-amt{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--purple);line-height:1;}
-  .overall-amt .rm{font-size:13px;margin-right:1px;}
+  .overall-amt{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--purple);line-height:1;}
+  .overall-amt .rm{font-size:12px;margin-right:1px;}
   .overall-pct-row{font-family:'DM Mono',monospace;font-size:10px;color:var(--purple);opacity:.7;margin-top:3px;}
 
-  /* ── Tiers ── */
-  .tiers{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;}
+  .tiers{display:flex;flex-direction:column;justify-content:center;gap:11px;padding:6px 0;}
   .tier-row{display:flex;align-items:center;gap:10px;}
   .tier-pill{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;width:36px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid;}
   .pill-d{background:var(--gold-bg);border-color:var(--gold-border);color:var(--gold);}
   .pill-t{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue);}
-  .bar-wrap{flex:1;height:10px;background:var(--surface2);border-radius:999px;overflow:hidden;}
+  .bar-wrap{flex:1;height:10px;background:var(--surface2);border-radius:999px;overflow:hidden;min-width:40px;}
   .bar-fill{height:100%;border-radius:999px;transition:width 1.2s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;}
   .bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,rgba(255,255,255,.5));animation:shim 2.5s infinite;}
   @keyframes shim{0%,100%{opacity:0}50%{opacity:1}}
@@ -93,81 +110,76 @@
   .ftt2{background:linear-gradient(90deg,#1a6bc8,#4f46e5);}
   .ftt3{background:linear-gradient(90deg,#4f46e5,#7c3aed);}
 
-  .tier-right{display:flex;align-items:center;gap:7px;flex-shrink:0;justify-content:flex-end;}
-  .tier-tgt{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-width:72px;text-align:right;}
-
-  /* Daily bonus tag — fixed RM */
-  .tier-bonus{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;white-space:nowrap;background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);min-width:60px;text-align:center;}
-  /* Total tier commission tag — percentage based */
-  .tier-bonus-pct{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;white-space:nowrap;background:var(--purple-bg);border:1px solid var(--purple-border);color:var(--purple);min-width:60px;text-align:center;}
-
-  .tier-pct{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;width:40px;text-align:right;color:var(--text);}
-  .badge{font-family:'DM Mono',monospace;font-size:10px;padding:3px 8px;border-radius:5px;min-width:52px;text-align:center;border:1px solid;}
+  .tier-right{display:flex;align-items:center;gap:6px;width:260px;flex-shrink:0;justify-content:flex-end;flex-wrap:nowrap;}
+  .tier-tgt{font-family:"DM Mono",monospace;font-size:11px;color:var(--muted);min-width:80px;text-align:right;}
+  .tier-bonus{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);min-width:70px;text-align:center;}
+  .tier-bonus-pct{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--purple-bg);border:1px solid var(--purple-border);color:var(--purple);min-width:70px;text-align:center;}
+  .tier-pct{font-family:"DM Mono",monospace;font-size:12px;font-weight:500;width:42px;text-align:right;color:var(--text);}
+  .badge{font-family:"DM Mono",monospace;font-size:10px;padding:3px 7px;border-radius:5px;min-width:62px;text-align:center;border:1px solid;white-space:nowrap;}
   .bh{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
   .bc{background:#fff8ec;border-color:#fcd97a;color:var(--amber);}
   .bm{background:var(--surface2);border-color:var(--border2);color:var(--muted);}
 
-  /* ── Clock zone ── */
-  .clock-zone{height:25vh;flex-shrink:0;border-top:2px solid var(--border);background:var(--surface);display:flex;}
-  .cam-wrap{width:calc(25vh*1.25);flex-shrink:0;position:relative;background:var(--surface2);border-right:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  /* Clock zone */
+  .clock-zone{border-top:2px solid var(--border);background:var(--surface);display:flex;}
+  .cam-wrap{width:calc(26vh*1.25);flex-shrink:0;position:relative;background:var(--surface2);border-right:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;}
   #video{width:100%;height:100%;object-fit:cover;display:none;transform:scaleX(-1);}
   #canvas{display:none;position:absolute;top:0;left:0;width:100%;height:100%;}
   .cam-idle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;pointer-events:none;}
   .cam-idle-icon{font-size:24px;opacity:.18;}
   .cam-idle-text{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted2);}
   .cam-rec{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--red);display:none;animation:blink .8s infinite;}
-  .emp-section{flex:1;display:flex;flex-direction:column;justify-content:center;padding:12px 18px;gap:9px;border-right:1px solid var(--border);}
+  .emp-section{flex:1;display:flex;flex-direction:column;justify-content:center;padding:12px 16px;gap:9px;border-right:1px solid var(--border);}
   .zone-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
   .emp-grid{display:flex;flex-wrap:wrap;gap:7px;}
   .emp-btn{background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:7px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .12s;white-space:nowrap;}
   .emp-btn:hover,.emp-btn.sel{background:var(--gold-bg);border-color:var(--gold-border);color:var(--gold);font-weight:600;}
-  .punch-section{width:160px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:14px;gap:9px;border-right:1px solid var(--border);}
-  .btn-in,.btn-out{width:100%;height:42px;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .12s;}
+  .punch-section{width:155px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px;gap:8px;border-right:1px solid var(--border);}
+  .btn-in,.btn-out{width:100%;height:40px;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .12s;}
   .btn-in{background:var(--green);border:none;color:#fff;}
   .btn-out{background:var(--bg);border:1.5px solid var(--border2);color:var(--muted);}
   .btn-in:active{transform:scale(.97);}
   .btn-out:hover{border-color:var(--red);color:var(--red);}
-  .feed-section{flex:1;display:flex;flex-direction:column;padding:11px 14px;gap:6px;overflow:hidden;min-width:0;}
-  .feed-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;}
-  .feed-item{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:7px;animation:fdIn .2s ease;flex-shrink:0;}
+  .feed-section{flex:1;display:flex;flex-direction:column;padding:10px 12px;gap:6px;overflow:hidden;min-width:0;}
+  .feed-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
+  .feed-item{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 9px;background:var(--bg);border:1px solid var(--border);border-radius:7px;animation:fdIn .2s ease;flex-shrink:0;}
   @keyframes fdIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
   .fdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
   .fdot-in{background:var(--green);} .fdot-out{background:var(--red);}
   .fname{font-weight:600;} .ftype{font-size:10px;color:var(--muted);}
   .ftime{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
-  .settings-col{width:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);}
+  .settings-col{width:42px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:1px solid var(--border);}
   .settings-btn{writing-mode:vertical-rl;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);cursor:pointer;background:none;border:none;padding:8px;transition:color .15s;}
   .settings-btn:hover{color:var(--text);}
 
-  @keyframes glowGold{0%,100%{box-shadow:none}50%{box-shadow:inset 0 0 0 2px var(--gold-border),0 0 32px 4px rgba(200,150,12,.08)}}
+  @keyframes glowGold{0%,100%{box-shadow:none}50%{box-shadow:inset 0 0 0 2px var(--gold-border),0 0 30px 3px rgba(200,150,12,.08)}}
   .glow-gold{animation:glowGold 2.5s infinite;}
 
-  .toast{position:fixed;bottom:calc(25vh+14px);left:50%;transform:translateX(-50%) translateY(16px);padding:9px 22px;border-radius:8px;font-family:'DM Mono',monospace;font-size:13px;opacity:0;transition:all .22s;z-index:100;pointer-events:none;white-space:nowrap;color:#fff;}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);padding:9px 22px;border-radius:8px;font-family:'DM Mono',monospace;font-size:13px;opacity:0;transition:all .22s;z-index:200;pointer-events:none;white-space:nowrap;color:#fff;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .toast.ok{background:var(--green);} .toast.err{background:var(--red);} .toast.info{background:var(--text);}
   .flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:99;transition:opacity .06s;}
   .flash.on{opacity:.5;}
 
-  /* ── Update Sales Modal ── */
+  /* Update Sales Modal */
   .update-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
   .update-modal-bg.open{display:flex;}
-  .update-modal{background:var(--bg);border:1px solid var(--border2);border-radius:16px;padding:28px;width:340px;display:flex;flex-direction:column;gap:18px;box-shadow:0 20px 60px rgba(0,0,0,.12);}
+  .update-modal{background:var(--bg);border:1px solid var(--border2);border-radius:16px;padding:28px;width:min(340px,90vw);display:flex;flex-direction:column;gap:18px;box-shadow:0 20px 60px rgba(0,0,0,.12);}
   .um-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;}
   .um-sub{font-size:13px;color:var(--muted);margin-top:4px;}
   .um-input-wrap{display:flex;align-items:center;border:1.5px solid var(--border2);border-radius:9px;overflow:hidden;transition:border-color .15s;}
   .um-input-wrap:focus-within{border-color:var(--gold);}
-  .um-prefix{padding:0 12px;font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--gold);background:var(--gold-bg);border-right:1px solid var(--gold-border);height:48px;display:flex;align-items:center;flex-shrink:0;}
-  .um-input{flex:1;height:48px;border:none;outline:none;padding:0 14px;font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--text);background:var(--bg);}
+  .um-prefix{padding:0 12px;font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--gold);background:var(--gold-bg);border-right:1px solid var(--gold-border);height:52px;display:flex;align-items:center;flex-shrink:0;}
+  .um-input{flex:1;height:52px;border:none;outline:none;padding:0 14px;font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text);background:var(--bg);}
   .um-actions{display:flex;gap:8px;}
-  .um-confirm{flex:1;background:var(--green);border:none;border-radius:9px;height:44px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .15s;}
+  .um-confirm{flex:1;background:var(--green);border:none;border-radius:9px;height:46px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .15s;}
   .um-confirm:hover{opacity:.85;}
-  .um-cancel{background:var(--bg);border:1.5px solid var(--border2);border-radius:9px;height:44px;padding:0 18px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--muted);cursor:pointer;}
-  .um-cancel:hover{border-color:#aaa;color:var(--text);}
+  .um-cancel{background:var(--bg);border:1.5px solid var(--border2);border-radius:9px;height:46px;padding:0 18px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--muted);cursor:pointer;}
 
-  /* ── Setup Modal ── */
+  /* Setup Modal */
   .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
   .modal-bg.open{display:flex;}
-  .modal{background:var(--bg);border:1px solid var(--border2);border-radius:16px;padding:28px;width:480px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 60px rgba(0,0,0,.15);}
+  .modal{background:var(--bg);border:1px solid var(--border2);border-radius:16px;padding:28px;width:min(480px,92vw);max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 60px rgba(0,0,0,.15);}
   .modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
   .fg{display:flex;flex-direction:column;gap:6px;}
   .fl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
@@ -175,12 +187,12 @@
   input:focus{border-color:var(--gold);}
   .status-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;line-height:2;font-family:'DM Mono',monospace;}
   .status-box .ok{color:var(--green);} .status-box .er{color:var(--red);} .status-box .warn{color:var(--amber);}
-  .ma{display:flex;gap:8px;}
+  .ma{display:flex;gap:8px;flex-wrap:wrap;}
   .btn-save{flex:1;background:var(--text);border:none;border-radius:8px;padding:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;color:#fff;}
   .btn-save:hover{opacity:.8;}
-  .btn-test{background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;color:var(--muted);}
+  .btn-test{background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;color:var(--muted);}
   .btn-test:hover{border-color:var(--blue);color:var(--blue);}
-  .btn-cancel{background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;color:var(--muted);}
+  .btn-cancel{background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;color:var(--muted);}
   ::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
 </head>
@@ -192,7 +204,7 @@
     <div class="tb-clock" id="liveClock">--:--:--</div>
     <div class="tb-right">
       <div class="tb-date" id="liveDate">--</div>
-      <div class="sync-pill" onclick="manualRefresh()" title="Click to refresh">
+      <div class="sync-pill" onclick="manualRefresh()" title="Tap to refresh">
         <div class="sync-dot" id="syncDot"></div>
         <span id="syncText">SETUP</span>
       </div>
@@ -208,58 +220,51 @@
         <div>
           <div class="sec-label">Today's Sales</div>
           <div class="sales-row">
-            <div class="big-num">
-              <span class="cur">RM</span>
-              <span class="amt" id="dailyAmt">—</span>
-            </div>
+            <div class="big-num"><span class="cur">RM</span><span class="amt" id="dailyAmt">—</span></div>
             <button class="update-btn" onclick="openUpdateModal()">✎ Update</button>
           </div>
         </div>
-
-        <!-- Daily Bonus chip -->
         <div class="bonus-chip">
           <div class="bonus-chip-lbl">Daily Bonus</div>
           <div class="bonus-chip-top">
             <div class="bonus-chip-amt"><span class="rm">RM</span><span id="commAmt">—</span></div>
             <div class="badge bm" id="commStatus">—</div>
           </div>
-          <!-- Total bonus row -->
           <div class="bonus-total-row">
             <span class="bonus-total-lbl">TOTAL BONUS</span>
             <span class="bonus-total-amt">RM <span id="totalBonusAmt">—</span></span>
           </div>
         </div>
       </div>
-
       <div class="tiers">
         <div class="tier-row">
           <div class="tier-pill pill-d">T1</div>
           <div class="bar-wrap"><div class="bar-fill ft1" id="t1Bar" style="width:0"></div></div>
           <div class="tier-right">
-            <span class="tier-tgt"   id="t1Tgt">—</span>
+            <span class="tier-tgt" id="t1Tgt">—</span>
             <span class="tier-bonus" id="t1Bonus">—</span>
-            <span class="tier-pct"   id="t1Pct">—</span>
-            <span class="badge bm"   id="t1Badge">—</span>
+            <span class="tier-pct" id="t1Pct">—</span>
+            <span class="badge bm" id="t1Badge">—</span>
           </div>
         </div>
         <div class="tier-row">
           <div class="tier-pill pill-d">T2</div>
           <div class="bar-wrap"><div class="bar-fill ft2" id="t2Bar" style="width:0"></div></div>
           <div class="tier-right">
-            <span class="tier-tgt"   id="t2Tgt">—</span>
+            <span class="tier-tgt" id="t2Tgt">—</span>
             <span class="tier-bonus" id="t2Bonus">—</span>
-            <span class="tier-pct"   id="t2Pct">—</span>
-            <span class="badge bm"   id="t2Badge">—</span>
+            <span class="tier-pct" id="t2Pct">—</span>
+            <span class="badge bm" id="t2Badge">—</span>
           </div>
         </div>
         <div class="tier-row">
           <div class="tier-pill pill-d">T3</div>
           <div class="bar-wrap"><div class="bar-fill ft3" id="t3Bar" style="width:0"></div></div>
           <div class="tier-right">
-            <span class="tier-tgt"   id="t3Tgt">—</span>
+            <span class="tier-tgt" id="t3Tgt">—</span>
             <span class="tier-bonus" id="t3Bonus">—</span>
-            <span class="tier-pct"   id="t3Pct">—</span>
-            <span class="badge bm"   id="t3Badge">—</span>
+            <span class="tier-pct" id="t3Pct">—</span>
+            <span class="badge bm" id="t3Badge">—</span>
           </div>
         </div>
       </div>
@@ -270,59 +275,52 @@
       <div class="panel-head">
         <div>
           <div class="sec-label">Total Sales</div>
-          <div class="big-num">
-            <span class="cur blue">RM</span>
-            <span class="amt" id="totalAmt">—</span>
-          </div>
+          <div class="big-num"><span class="cur blue">RM</span><span class="amt" id="totalAmt">—</span></div>
         </div>
-        <!-- Overall commission chip — shows % earned and RM amount -->
         <div class="overall-chip">
           <div class="sec-label">Overall Comm</div>
           <div class="overall-amt"><span class="rm">RM</span><span id="overallComm">—</span></div>
           <div class="overall-pct-row" id="overallPctRow">—</div>
         </div>
       </div>
-
       <div class="tiers">
-        <!-- TT tiers: bonus tag shows "X%" rate, badge shows RM earned or gap -->
         <div class="tier-row">
           <div class="tier-pill pill-t">TT1</div>
           <div class="bar-wrap"><div class="bar-fill ftt1" id="tt1Bar" style="width:0"></div></div>
           <div class="tier-right">
-            <span class="tier-tgt"       id="tt1Tgt">—</span>
+            <span class="tier-tgt" id="tt1Tgt">—</span>
             <span class="tier-bonus-pct" id="tt1BonusPct">—</span>
-            <span class="tier-pct"       id="tt1Pct">—</span>
-            <span class="badge bm"       id="tt1Badge">—</span>
+            <span class="tier-pct" id="tt1Pct">—</span>
+            <span class="badge bm" id="tt1Badge">—</span>
           </div>
         </div>
         <div class="tier-row">
           <div class="tier-pill pill-t">TT2</div>
           <div class="bar-wrap"><div class="bar-fill ftt2" id="tt2Bar" style="width:0"></div></div>
           <div class="tier-right">
-            <span class="tier-tgt"       id="tt2Tgt">—</span>
+            <span class="tier-tgt" id="tt2Tgt">—</span>
             <span class="tier-bonus-pct" id="tt2BonusPct">—</span>
-            <span class="tier-pct"       id="tt2Pct">—</span>
-            <span class="badge bm"       id="tt2Badge">—</span>
+            <span class="tier-pct" id="tt2Pct">—</span>
+            <span class="badge bm" id="tt2Badge">—</span>
           </div>
         </div>
         <div class="tier-row">
           <div class="tier-pill pill-t">TT3</div>
           <div class="bar-wrap"><div class="bar-fill ftt3" id="tt3Bar" style="width:0"></div></div>
           <div class="tier-right">
-            <span class="tier-tgt"       id="tt3Tgt">—</span>
+            <span class="tier-tgt" id="tt3Tgt">—</span>
             <span class="tier-bonus-pct" id="tt3BonusPct">—</span>
-            <span class="tier-pct"       id="tt3Pct">—</span>
-            <span class="badge bm"       id="tt3Badge">—</span>
+            <span class="tier-pct" id="tt3Pct">—</span>
+            <span class="badge bm" id="tt3Badge">—</span>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- Clock zone -->
   <div class="clock-zone">
-    <div class="cam-wrap">
+    <div class="cam-wrap" id="camWrap">
       <video id="video" autoplay playsinline muted></video>
       <canvas id="canvas"></canvas>
       <div class="cam-idle" id="camIdle">
@@ -334,7 +332,7 @@
     <div class="emp-section">
       <div class="zone-label">Select Employee</div>
       <div class="emp-grid" id="empGrid">
-        <div style="font-size:12px;color:var(--muted)">Connect Sheets to load…</div>
+        <div style="font-size:12px;color:var(--muted)">Loading…</div>
       </div>
     </div>
     <div class="punch-section">
@@ -351,7 +349,7 @@
     </div>
   </div>
 
-</div>
+</div><!-- /layout -->
 
 <div class="flash" id="flash"></div>
 <div class="toast" id="toast"></div>
@@ -361,14 +359,14 @@
   <div class="update-modal">
     <div>
       <div class="um-title">Update Today's Sales</div>
-      <div class="um-sub">Enter the latest figure from StoreHub</div>
+      <div class="um-sub">Saves directly to Google Sheets</div>
     </div>
     <div class="um-input-wrap">
       <div class="um-prefix">RM</div>
-      <input class="um-input" id="umInput" type="number" placeholder="0" min="0" inputmode="numeric">
+      <input class="um-input" id="umInput" type="number" placeholder="0" min="0" inputmode="decimal">
     </div>
     <div class="um-actions">
-      <button class="um-confirm" onclick="confirmUpdate()">Confirm Update</button>
+      <button class="um-confirm" onclick="confirmUpdate()">Confirm</button>
       <button class="um-cancel"  onclick="closeUpdateModal()">Cancel</button>
     </div>
   </div>
@@ -392,142 +390,136 @@
 </div>
 
 <script>
-var CFG = { sheetUrl: "" };
-var selEmp = null, camStream = null, syncTimer = null;
-var lastData = null;
+// ── URL hardcoded — always use this, overrides localStorage ──
+var SHEET_URL = "https://script.google.com/macros/s/AKfycbwPPUwoUggxLUfHie6Ao0iQCSPqitzm0G_hCojjpedB5-4MBq5FDN6eTZ98DtyqIHDL/exec";
 
-function loadCFG(){ try{ Object.assign(CFG, JSON.parse(localStorage.getItem("csCFG")||"{}")); }catch(e){} }
-function saveCFG(){ localStorage.setItem("csCFG", JSON.stringify(CFG)); }
+var selEmp = null, camStream = null, syncTimer = null, lastData = null;
 
 function tick(){
-  var n = new Date();
-  document.getElementById("liveClock").textContent = n.toLocaleTimeString("en-MY",{hour12:false});
-  document.getElementById("liveDate").textContent  = n.toLocaleDateString("en-MY",{weekday:"short",day:"numeric",month:"short"});
+  var n=new Date();
+  document.getElementById("liveClock").textContent=n.toLocaleTimeString("en-MY",{hour12:false});
+  document.getElementById("liveDate").textContent=n.toLocaleDateString("en-MY",{weekday:"short",day:"numeric",month:"short"});
 }
 
-function animN(el, to){
+function animN(el,to){
   if(isNaN(to)) return;
-  var from = parseFloat(el.textContent.replace(/[RM,—%]/g,""))||0;
-  var t0 = performance.now(), dur = 900;
-  function step(t){
-    var p=Math.min((t-t0)/dur,1), e=1-Math.pow(1-p,3);
-    el.textContent = Math.round(from+(to-from)*e).toLocaleString();
-    if(p<1) requestAnimationFrame(step);
-  }
+  var from=parseFloat(el.textContent.replace(/[RM,—%]/g,""))||0;
+  var t0=performance.now(),dur=900;
+  function step(t){var p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.round(from+(to-from)*e).toLocaleString();if(p<1)requestAnimationFrame(step);}
   requestAnimationFrame(step);
 }
 
-function setBadge(el, cur, tgt){
-  if(!tgt){ el.textContent="—"; el.className="badge bm"; return; }
-  var pct = cur/tgt*100;
-  if(cur>=tgt)    { el.textContent="Hit ✓"; el.className="badge bh"; }
-  else if(pct>=80){ el.textContent="Close!"; el.className="badge bc"; }
-  else            { el.textContent="RM "+(tgt-cur).toLocaleString(); el.className="badge bm"; }
+function setBadge(el,cur,tgt){
+  if(!tgt){el.textContent="—";el.className="badge bm";return;}
+  var pct=cur/tgt*100;
+  if(cur>=tgt)    {el.textContent="Hit ✓";el.className="badge bh";}
+  else if(pct>=80){el.textContent="Close!";el.className="badge bc";}
+  else            {var gap=tgt-cur;el.textContent=gap>=1000?"RM "+(gap/1000).toFixed(1)+"k":"RM "+gap.toLocaleString();el.className="badge bm";}
 }
 
 function renderDash(d){
-  lastData = d;
+  lastData=d;
   var ds=d.daily_sales||0;
-  var ts=(d.total_sales||0)+ds;  // Total Sales = historical (C) + today (B)
-  var t1=d.t1||0, t2=d.t2||0, t3=d.t3||0;
-  var b1=d.bonus1||0, b2=d.bonus2||0, b3=d.bonus3||0;
+  var ts=(d.total_sales||0)+ds;   // historical C col + today B col
+  var t1=d.t1||0,t2=d.t2||0,t3=d.t3||0;
+  var b1=d.bonus1||0,b2=d.bonus2||0,b3=d.bonus3||0;
   var tb=d.total_bonus||0;
-  var tt1=d.tt1||0, tt2=d.tt2||0, tt3=d.tt3||0;
-  var p1=d.tt1_pct||0, p2=d.tt2_pct||0, p3=d.tt3_pct||0;
+  var tt1=d.tt1||0,tt2=d.tt2||0,tt3=d.tt3||0;
+  var p1=d.tt1_pct||0,p2=d.tt2_pct||0,p3=d.tt3_pct||0;
 
-  animN(document.getElementById("dailyAmt"), ds);
-  animN(document.getElementById("totalAmt"), ts);
+  animN(document.getElementById("dailyAmt"),ds);
+  animN(document.getElementById("totalAmt"),ts);
 
-  // ── Daily tiers ──
-  function dailyTier(barId,pctId,tgtId,bonId,bdId, cur,tgt,bonus){
-    var pct = tgt ? Math.min(cur/tgt*100,100) : 0;
-    document.getElementById(barId).style.width = pct+"%";
-    document.getElementById(pctId).textContent = tgt ? pct.toFixed(0)+"%" : "—";
-    document.getElementById(tgtId).textContent = tgt ? "RM "+tgt.toLocaleString() : "—";
-    var bo = document.getElementById(bonId);
-    bo.textContent = bonus ? "RM "+bonus.toLocaleString() : "—";
-    setBadge(document.getElementById(bdId), cur, tgt);
+  // Daily tiers
+  function dailyTier(bId,pId,tId,boId,bdId,cur,tgt,bonus){
+    var pct=tgt?Math.min(cur/tgt*100,100):0;
+    document.getElementById(bId).style.width=pct+"%";
+    document.getElementById(pId).textContent=tgt?pct.toFixed(0)+"%":"—";
+    document.getElementById(tId).textContent=tgt?"RM "+tgt.toLocaleString():"—";
+    document.getElementById(boId).textContent=bonus?"RM "+bonus.toLocaleString():"—";
+    setBadge(document.getElementById(bdId),cur,tgt);
   }
+  dailyTier("t1Bar","t1Pct","t1Tgt","t1Bonus","t1Badge",ds,t1,b1);
+  dailyTier("t2Bar","t2Pct","t2Tgt","t2Bonus","t2Badge",ds,t2,b2);
+  dailyTier("t3Bar","t3Pct","t3Tgt","t3Bonus","t3Badge",ds,t3,b3);
 
-  dailyTier("t1Bar","t1Pct","t1Tgt","t1Bonus","t1Badge", ds,t1,b1);
-  dailyTier("t2Bar","t2Pct","t2Tgt","t2Bonus","t2Badge", ds,t2,b2);
-  dailyTier("t3Bar","t3Pct","t3Tgt","t3Bonus","t3Badge", ds,t3,b3);
+  // Daily Bonus chip — non-cumulative
+  var cA=document.getElementById("commAmt"),cS=document.getElementById("commStatus"),dc=document.getElementById("dailyCard");
+  var earned=0;
+  if(t3&&ds>=t3)     {earned=b3;cS.textContent="T3 Hit!";cS.className="badge bh";dc.classList.add("glow-gold");}
+  else if(t2&&ds>=t2){earned=b2;cS.textContent="T2 Hit!";cS.className="badge bh";dc.classList.add("glow-gold");}
+  else if(t1&&ds>=t1){earned=b1;cS.textContent="T1 Hit!";cS.className="badge bc";dc.classList.add("glow-gold");}
+  else               {earned=0; cS.textContent="Not yet"; cS.className="badge bm";dc.classList.remove("glow-gold");}
+  animN(cA,earned);
 
-  // ── Daily Bonus chip ──
-  // Non-cumulative: each tier has its own fixed bonus, hit T2 = T2's bonus only
-  var cA=document.getElementById("commAmt"), cS=document.getElementById("commStatus");
-  var dc=document.getElementById("dailyCard");
-  var earnedDailyBonus = 0;
-  if(t3&&ds>=t3)     { earnedDailyBonus=b3; cS.textContent="T3 Hit!"; cS.className="badge bh"; dc.classList.add("glow-gold"); }
-  else if(t2&&ds>=t2){ earnedDailyBonus=b2; cS.textContent="T2 Hit!"; cS.className="badge bh"; dc.classList.add("glow-gold"); }
-  else if(t1&&ds>=t1){ earnedDailyBonus=b1; cS.textContent="T1 Hit!"; cS.className="badge bc"; dc.classList.add("glow-gold"); }
-  else               { earnedDailyBonus=0;  cS.textContent="Not yet";  cS.className="badge bm"; dc.classList.remove("glow-gold"); }
-  animN(cA, earnedDailyBonus);
+  // Total Bonus = J col (history) + today earned — realtime
+  document.getElementById("totalBonusAmt").textContent=(tb+earned).toLocaleString()||"—";
 
-  // Total Bonus = J col (history, excludes today) + today's earned bonus — realtime
-  var totalBonusLive = tb + earnedDailyBonus;
-  var tbEl = document.getElementById("totalBonusAmt");
-  tbEl.textContent = totalBonusLive ? totalBonusLive.toLocaleString() : "—";
-
-  // ── Total tiers (percentage-based commission) ──
-  function totalTier(barId,pctId,tgtId,bpctId,bdId, cur,tgt,rate){
-    var pct = tgt ? Math.min(cur/tgt*100,100) : 0;
-    document.getElementById(barId).style.width = pct+"%";
-    document.getElementById(pctId).textContent = tgt ? pct.toFixed(0)+"%" : "—";
-    document.getElementById(tgtId).textContent = tgt ? "RM "+tgt.toLocaleString() : "—";
-    document.getElementById(bpctId).textContent = rate ? rate+"% comm" : "—";
-    setBadge(document.getElementById(bdId), cur, tgt);
+  // Total tiers
+  function totalTier(bId,pId,tId,bpId,bdId,cur,tgt,rate){
+    var pct=tgt?Math.min(cur/tgt*100,100):0;
+    document.getElementById(bId).style.width=pct+"%";
+    document.getElementById(pId).textContent=tgt?pct.toFixed(0)+"%":"—";
+    document.getElementById(tId).textContent=tgt?"RM "+tgt.toLocaleString():"—";
+    document.getElementById(bpId).textContent=rate?rate+"% comm":"—";
+    setBadge(document.getElementById(bdId),cur,tgt);
   }
+  totalTier("tt1Bar","tt1Pct","tt1Tgt","tt1BonusPct","tt1Badge",ts,tt1,p1);
+  totalTier("tt2Bar","tt2Pct","tt2Tgt","tt2BonusPct","tt2Badge",ts,tt2,p2);
+  totalTier("tt3Bar","tt3Pct","tt3Tgt","tt3BonusPct","tt3Badge",ts,tt3,p3);
 
-  totalTier("tt1Bar","tt1Pct","tt1Tgt","tt1BonusPct","tt1Badge", ts,tt1,p1);
-  totalTier("tt2Bar","tt2Pct","tt2Tgt","tt2BonusPct","tt2Badge", ts,tt2,p2);
-  totalTier("tt3Bar","tt3Pct","tt3Tgt","tt3BonusPct","tt3Badge", ts,tt3,p3);
-
-  // ── Overall Comm: auto-calculated, highest hit TT tier % x total_sales ──
-  var activePct = 0;
-  if(p3&&ts>=tt3)      activePct = p3;
-  else if(p2&&ts>=tt2) activePct = p2;
-  else if(p1&&ts>=tt1) activePct = p1;
-
-  var calcComm = activePct ? Math.round(ts * activePct / 100) : 0;
-  animN(document.getElementById("overallComm"), calcComm);
-  document.getElementById("overallPctRow").textContent =
-    activePct
-      ? activePct + "% × RM " + ts.toLocaleString() + " = RM " + calcComm.toLocaleString()
-      : "Hit a TT tier to earn";
+  // Overall Comm auto-calculated
+  var activePct=0;
+  if(p3&&ts>=tt3) activePct=p3;
+  else if(p2&&ts>=tt2) activePct=p2;
+  else if(p1&&ts>=tt1) activePct=p1;
+  var calcComm=activePct?Math.round(ts*activePct/100):0;
+  animN(document.getElementById("overallComm"),calcComm);
+  document.getElementById("overallPctRow").textContent=
+    activePct?activePct+"% × RM "+ts.toLocaleString():"Hit a TT tier to earn";
 }
 
 function renderEmps(emps){
   var g=document.getElementById("empGrid"); g.innerHTML="";
-  if(!emps||!emps.length){ g.innerHTML="<div style=\"font-size:12px;color:var(--muted)\">No employees found</div>"; return; }
+  if(!emps||!emps.length){g.innerHTML="<div style=\"font-size:12px;color:var(--muted)\">No employees found</div>";return;}
   for(var i=0;i<emps.length;i++){
     (function(name){
       var b=document.createElement("button"); b.className="emp-btn"; b.textContent=name;
-      b.onclick=function(){ selEmp=name; document.querySelectorAll(".emp-btn").forEach(function(x){x.classList.remove("sel");}); b.classList.add("sel"); startCam(); };
+      b.onclick=function(){selEmp=name;document.querySelectorAll(".emp-btn").forEach(function(x){x.classList.remove("sel");});b.classList.add("sel");startCam();};
       g.appendChild(b);
     })(emps[i]);
   }
 }
 
-// Update modal
+// ── Update Sales — writes back to Sheets ──────────────────
 function openUpdateModal(){
   var cur=(lastData&&lastData.daily_sales)?lastData.daily_sales:0;
   document.getElementById("umInput").value=cur||"";
   document.getElementById("updateModalBg").classList.add("open");
-  setTimeout(function(){ var el=document.getElementById("umInput"); el.focus(); el.select(); },100);
+  setTimeout(function(){var el=document.getElementById("umInput");el.focus();el.select();},100);
 }
-function closeUpdateModal(){ document.getElementById("updateModalBg").classList.remove("open"); }
+function closeUpdateModal(){document.getElementById("updateModalBg").classList.remove("open");}
+
 function confirmUpdate(){
   var val=parseFloat(document.getElementById("umInput").value);
-  if(isNaN(val)||val<0){ showToast("Please enter a valid amount","err"); return; }
-  if(lastData){ lastData.daily_sales=val; renderDash(lastData); }
-  if(CFG.sheetUrl){
-    var now=new Date();
-    fetch(CFG.sheetUrl,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"updateSales",daily_sales:val,date:now.toLocaleDateString("en-MY")})}).catch(function(){});
-  }
+  if(isNaN(val)||val<0){showToast("Please enter a valid amount","err");return;}
+
+  // Update local display immediately
+  if(lastData){lastData.daily_sales=val;renderDash(lastData);}
   closeUpdateModal();
-  showToast("Updated to RM "+val.toLocaleString(),"ok");
+  showToast("Saving to Sheets…","info");
+
+  // Write back to Sheets via POST
+  fetch(SHEET_URL,{
+    method:"POST",
+    redirect:"follow",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({action:"updateSales",daily_sales:val})
+  }).then(function(){
+    showToast("Saved RM "+val.toLocaleString()+" to Sheets ✓","ok");
+  }).catch(function(){
+    showToast("Display updated (Sheets sync failed)","err");
+  });
 }
 
 document.addEventListener("DOMContentLoaded",function(){
@@ -574,19 +566,18 @@ function jsonpFetch(url){
     var timer=setTimeout(function(){cleanup();reject(new Error("Timeout"));},10000);
     function cleanup(){clearTimeout(timer);delete window[cbName];if(script.parentNode)script.parentNode.removeChild(script);}
     window[cbName]=function(data){cleanup();resolve(data);};
-    script.onerror=function(){cleanup();reject(new Error("Script failed — redeploy as New Deployment"));};
+    script.onerror=function(){cleanup();reject(new Error("Script failed — check deployment"));};
     script.src=url+(url.indexOf("?")>=0?"&":"?")+"callback="+cbName+"&_t="+Date.now();
     document.head.appendChild(script);
   });
 }
 
-function setSyncUI(s,l){ document.getElementById("syncDot").className="sync-dot"+(s?" "+s:""); document.getElementById("syncText").textContent=l; }
+function setSyncUI(s,l){document.getElementById("syncDot").className="sync-dot"+(s?" "+s:"");document.getElementById("syncText").textContent=l;}
 
 async function fetchSheets(silent){
-  if(!CFG.sheetUrl) return null;
   setSyncUI("spin","SYNCING");
   try{
-    var d=await jsonpFetch(CFG.sheetUrl);
+    var d=await jsonpFetch(SHEET_URL);
     setSyncUI("ok","LIVE"); renderDash(d); renderEmps(d.employees||[]);
     if(!silent) showToast("Refreshed","ok");
     return d;
@@ -597,12 +588,11 @@ async function fetchSheets(silent){
   }
 }
 
-function manualRefresh(){ if(!CFG.sheetUrl){openModal();return;} fetchSheets(false); }
-function startAutoSync(){ clearInterval(syncTimer); if(CFG.sheetUrl){fetchSheets(true);syncTimer=setInterval(function(){fetchSheets(true);},60000);} }
+function manualRefresh(){fetchSheets(false);}
+function startAutoSync(){fetchSheets(true);syncTimer=setInterval(function(){fetchSheets(true);},60000);}
 
 function doAction(type){
   if(!selEmp){showToast("Please select employee","err");return;}
-  if(!CFG.sheetUrl){showToast("Setup Sheets URL first","err");return;}
   capturePhoto();
   var fl=document.getElementById("flash"); fl.classList.add("on"); setTimeout(function(){fl.classList.remove("on");},110);
   var now=new Date();
@@ -610,15 +600,14 @@ function doAction(type){
   var ds=now.toLocaleDateString("en-MY");
   addFeed(selEmp,type,ts);
   showToast((type==="IN"?"Clocked In: ":"Clocked Out: ")+selEmp,"ok");
-  fetch(CFG.sheetUrl,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({name:selEmp,type:type,date:ds,time:ts})}).catch(function(){});
+  fetch(SHEET_URL,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({name:selEmp,type:type,date:ds,time:ts})}).catch(function(){});
   setTimeout(function(){selEmp=null;document.querySelectorAll(".emp-btn").forEach(function(b){b.classList.remove("sel");});stopCam();},1500);
 }
 
 function addFeed(name,type,time){
   var f=document.getElementById("feedScroll");
   var el=document.createElement("div"); el.className="feed-item";
-  el.innerHTML="<div class=\"fdot "+(type==="IN"?"fdot-in":"fdot-out")+"\"></div>"
-    +"<span class=\"fname\">"+name+"</span><span class=\"ftype\">"+type+"</span><span class=\"ftime\">"+time+"</span>";
+  el.innerHTML="<div class=\"fdot "+(type==="IN"?"fdot-in":"fdot-out")+"\"></div><span class=\"fname\">"+name+"</span><span class=\"ftype\">"+type+"</span><span class=\"ftime\">"+time+"</span>";
   f.insertBefore(el,f.firstChild);
   while(f.children.length>15) f.removeChild(f.lastChild);
 }
@@ -630,39 +619,28 @@ function showToast(msg,type){
   setTimeout(function(){t.classList.remove("show");},2500);
 }
 
-function openModal(){ document.getElementById("s_url").value=CFG.sheetUrl; document.getElementById("modalBg").classList.add("open"); }
-function closeModal(){ document.getElementById("modalBg").classList.remove("open"); }
-
+// Setup modal (for manual URL override if ever needed)
+function openModal(){document.getElementById("s_url").value=SHEET_URL;document.getElementById("modalBg").classList.add("open");}
+function closeModal(){document.getElementById("modalBg").classList.remove("open");}
 async function testConn(){
   var url=document.getElementById("s_url").value.trim();
   var box=document.getElementById("statusBox");
-  if(!url){box.innerHTML="<span class=\"er\">Please enter URL</span>";return;}
   if(!url.endsWith("/exec")){box.innerHTML="<span class=\"warn\">⚠ URL must end with /exec</span>";return;}
   box.innerHTML="<span class=\"warn\">Testing…</span>";
-  CFG.sheetUrl=url; saveCFG();
   try{
     var d=await jsonpFetch(url);
-    setSyncUI("ok","LIVE");
-    box.innerHTML="<span class=\"ok\">✓ Connected!</span><br>"
-      +"Daily Sales: RM "+(d.daily_sales||0)+"  |  Today row: "+(d.ok?"Found ✓":"Not found — add today's date in Sales tab")+"<br>"
-      +"TT1: "+(d.tt1||0)+" @ "+(d.tt1_pct||0)+"%  TT2: "+(d.tt2||0)+" @ "+(d.tt2_pct||0)+"%  TT3: "+(d.tt3||0)+" @ "+(d.tt3_pct||0)+"%<br>"
-      +"Employees: "+((d.employees||[]).join(", ")||"(none found)");
-    renderDash(d); renderEmps(d.employees||[]);
+    box.innerHTML="<span class=\"ok\">✓ Connected!</span><br>Daily: RM "+(d.daily_sales||0)+" | Today row: "+(d.ok?"Found ✓":"Not found")+"<br>Employees: "+((d.employees||[]).join(", ")||"none");
+    setSyncUI("ok","LIVE"); renderDash(d); renderEmps(d.employees||[]);
   }catch(err){
+    box.innerHTML="<span class=\"er\">✗ "+err.message+"</span>";
     setSyncUI("err","ERROR");
-    box.innerHTML="<span class=\"er\">✗ "+err.message+"</span><br><span style=\"color:#999\">Update Code.gs and redeploy as New Deployment</span>";
   }
 }
-
 function saveSettings(){
-  CFG.sheetUrl=document.getElementById("s_url").value.trim();
-  saveCFG(); startAutoSync(); closeModal(); showToast("Saved","ok");
+  SHEET_URL=document.getElementById("s_url").value.trim();
+  closeModal(); startAutoSync(); showToast("Saved","ok");
 }
 
-// Default URL hardcoded — no setup needed on any device
-var DEFAULT_URL = "https://script.google.com/macros/s/AKfycbwPPUwoUggxLUfHie6Ao0iQCSPqitzm0G_hCojjpedB5-4MBq5FDN6eTZ98DtyqIHDL/exec";
-loadCFG();
-if (!CFG.sheetUrl) { CFG.sheetUrl = DEFAULT_URL; saveCFG(); }
 tick(); setInterval(tick,1000); startAutoSync();
 </script>
 </body>
