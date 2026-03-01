@@ -741,11 +741,20 @@ function closeUpdateModal(){document.getElementById("updateModalBg").classList.r
 function confirmUpdate(){
   var val=parseFloat(document.getElementById("umInput").value);
   if(isNaN(val)||val<0){showToast("Please enter a valid amount","err");return;}
+  // Update daily display immediately
   if(lastData){lastData.daily_sales=val;renderDash(lastData);}
   closeUpdateModal(); showToast("Saving…","info");
   fetch(SHEET_URL,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify({action:"updateSales",daily_sales:val})
-  }).then(function(){showToast("Saved RM "+val.toLocaleString()+" ✓","ok");}).catch(function(){showToast("Display updated (sync failed)","err");});
+  }).then(function(resp){ return resp.json(); })
+  .then(function(r){
+    if(r.ok){
+      showToast("Saved ✓  Total:RM "+r.total+" Bonus:RM "+r.total_bonus+" Comm:RM "+r.overall_comm,"ok");
+    } else {
+      showToast("Script error: "+(r.error||"unknown"),"err");
+    }
+    setTimeout(function(){ fetchSheets(true); }, 800);
+  }).catch(function(e){showToast("POST failed: "+e.message,"err");});
 }
 document.addEventListener("DOMContentLoaded",function(){
   document.getElementById("umInput").addEventListener("keydown",function(e){if(e.key==="Enter")confirmUpdate();if(e.key==="Escape")closeUpdateModal();});
