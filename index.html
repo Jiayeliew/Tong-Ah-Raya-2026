@@ -741,31 +741,37 @@ function closeUpdateModal(){document.getElementById("updateModalBg").classList.r
 function confirmUpdate(){
   var val=parseFloat(document.getElementById("umInput").value);
   if(isNaN(val)||val<0){showToast("Please enter a valid amount","err");return;}
-  // Update daily display immediately
-  if(lastData){lastData.daily_sales=val;renderDash(lastData);}
-  closeUpdateModal(); showToast("Saving…","info");
-  // Use dashboard's already-calculated values
+
+  // Save old daily BEFORE overwriting — total_sales from server already includes old daily
+  var oldDaily = lastData ? (lastData.daily_sales||0) : 0;
+  var oldTotal = lastData ? (lastData.total_sales||0) : 0;
+  // Correct new total = old total - old daily + new val
+  var _ts = oldTotal - oldDaily + val;
+
+  // Calculate overall_comm using corrected total
   var BASE=0.5, _activePct=BASE;
   if(lastData){
-    var _ts=(lastData.total_sales||0)+val;
     var _p1=lastData.tt1_pct||0,_p2=lastData.tt2_pct||0,_p3=lastData.tt3_pct||0;
     var _tt1=lastData.tt1||0,_tt2=lastData.tt2||0,_tt3=lastData.tt3||0;
     if(_p3&&_ts>=_tt3) _activePct=_p3;
     else if(_p2&&_ts>=_tt2) _activePct=_p2;
     else if(_p1&&_ts>=_tt1) _activePct=_p1;
   }
-  var _ts2=lastData?((lastData.total_sales||0)+val):val;
-  var _overallComm=parseFloat((_ts2*_activePct/100).toFixed(2));
+  var _overallComm=parseFloat((_ts*_activePct/100).toFixed(2));
 
-  // Earned daily bonus
+  // Earned daily bonus (based on new val)
   var _earned=0;
   if(lastData){
-    var _ds=val,_t1=lastData.t1||0,_t2=lastData.t2||0,_t3=lastData.t3||0;
+    var _t1=lastData.t1||0,_t2=lastData.t2||0,_t3=lastData.t3||0;
     var _b1=lastData.bonus1||0,_b2=lastData.bonus2||0,_b3=lastData.bonus3||0;
-    if(_t3&&_ds>=_t3) _earned=_b3;
-    else if(_t2&&_ds>=_t2) _earned=_b2;
-    else if(_t1&&_ds>=_t1) _earned=_b1;
+    if(_t3&&val>=_t3) _earned=_b3;
+    else if(_t2&&val>=_t2) _earned=_b2;
+    else if(_t1&&val>=_t1) _earned=_b1;
   }
+
+  // Update local display
+  if(lastData){lastData.daily_sales=val;renderDash(lastData);}
+  closeUpdateModal(); showToast("Saving…","info");
 
   fetch(SHEET_URL,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify({action:"updateSales",daily_sales:val,overall_comm:_overallComm,today_bonus:_earned})
