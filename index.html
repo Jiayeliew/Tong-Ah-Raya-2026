@@ -12,74 +12,56 @@
     --text:#111111; --muted:#999999; --muted2:#cccccc;
     --gold:#c8960c; --gold-bg:#fdf8ec; --gold-border:#f0d87a;
     --green:#1a9a5a; --green-bg:#edfaf3; --green-border:#a3dfbf;
-    --red:#d63b3b; --blue:#1a6bc8; --blue-bg:#edf4fd; --blue-border:#b3d1f7;
-    --amber:#d97706; --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-border:#c4b5fd;
+    --red:#d63b3b; --red-bg:#fff0f0; --red-border:#fca5a5;
+    --blue:#1a6bc8; --blue-bg:#edf4fd; --blue-border:#b3d1f7;
+    --amber:#d97706; --amber-bg:#fff8ec; --amber-border:#fcd97a;
+    --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-border:#c4b5fd;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{width:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
 
-  /* ─── TABLET LANDSCAPE: fixed full-screen ─── */
-  @media (min-width:900px) and (orientation:landscape) {
-    html,body{height:100%;overflow-y:auto;}
-    .layout{display:flex;flex-direction:column;width:100vw;min-height:100vh;}
-    .sales-zone{flex:1;min-height:0;display:flex;}
-    .panel{flex:1;display:flex;flex-direction:column;padding:18px 26px 14px;gap:11px;overflow:visible;}
-    .big-num .amt{font-size:72px;}
-    .clock-zone{min-height:220px;flex-shrink:0;}
-  }
-
-  /* ─── MOBILE / PORTRAIT: scrollable stack ─── */
-  @media not ((min-width:900px) and (orientation:landscape)) {
-    .layout{display:flex;flex-direction:column;width:100%;}
-    .sales-zone{flex-direction:column;}
-    .panel{padding:18px 16px 14px;gap:10px;}
-    .panel-daily{border-right:none!important;border-bottom:1px solid var(--border);}
-    .big-num .amt{font-size:52px;}
-    .clock-zone{flex-wrap:wrap;height:auto;}
-    .cam-wrap{width:100%!important;height:180px;border-right:none!important;border-bottom:1px solid var(--border);}
-    .emp-section{width:100%;border-right:none!important;border-bottom:1px solid var(--border);}
-    .punch-section{width:50%!important;border-bottom:1px solid var(--border);}
-    .feed-section{width:50%;border-bottom:1px solid var(--border);}
-    .settings-col{width:100%!important;border-left:none!important;border-top:1px solid var(--border);flex-direction:row!important;justify-content:center;padding:8px;}
-    .settings-btn{writing-mode:horizontal-tb!important;letter-spacing:2px;}
-    .tier-right{width:auto!important;}
-    .comm-chip,.bonus-chip{min-width:unset;}
-  }
-
-  /* ─── SHARED STYLES ─── */
-  .layout{overflow:visible;}
-  .topbar{height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+  /* ── Topbar ── */
+  .topbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
   .brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;letter-spacing:1px;}
   .brand span{color:var(--gold);}
   .tb-clock{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;letter-spacing:2px;}
   .tb-right{display:flex;align-items:center;gap:10px;}
   .tb-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
-  .sync-pill{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;background:var(--surface2);border:1px solid var(--border2);cursor:pointer;transition:all .15s;user-select:none;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;}
+  .sync-pill{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;background:var(--surface2);border:1px solid var(--border2);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;user-select:none;}
   .sync-pill:hover{border-color:#aaa;color:var(--text);}
-  .sync-pill:active{transform:scale(.97);}
   .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted2);flex-shrink:0;transition:background .3s;}
   .sync-dot.ok{background:var(--green);}
   .sync-dot.err{background:var(--red);animation:blink 1.5s infinite;}
   .sync-dot.spin{background:var(--amber);animation:blink .7s infinite;}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-  .setup-icon{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px;transition:color .15s;}
+  .setup-icon{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px;}
   .setup-icon:hover{color:var(--text);}
 
+  /* ── Tab bar ── */
+  .tabbar{display:flex;background:var(--bg);border-bottom:2px solid var(--border);position:sticky;top:50px;z-index:49;}
+  .tab-btn{flex:1;padding:12px 8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:all .15s;letter-spacing:.3px;}
+  .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:600;}
+  .tab-btn:hover:not(.active){color:var(--text);}
+
+  /* ── Tab panels ── */
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* ══════════════════════════════════
+     SALES TAB
+  ══════════════════════════════════ */
   .sales-zone{display:flex;}
-  .panel{display:flex;flex-direction:column;gap:11px;}
+  .panel{flex:1;display:flex;flex-direction:column;padding:18px 26px 14px;gap:11px;}
   .panel-daily{border-right:1px solid var(--border);}
   .sec-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
   .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-
   .sales-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;}
   .big-num{display:flex;align-items:flex-end;gap:3px;line-height:1;}
   .big-num .cur{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;padding-bottom:8px;color:var(--gold);}
   .big-num .cur.blue{color:var(--blue);}
-  .big-num .amt{font-family:'Playfair Display',serif;font-weight:900;letter-spacing:-2px;color:var(--text);}
-
+  .big-num .amt{font-family:'Playfair Display',serif;font-size:68px;font-weight:900;letter-spacing:-2px;color:var(--text);}
   .update-btn{margin-bottom:8px;padding:7px 14px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
   .update-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-bg);}
-
   .bonus-chip{background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;flex-shrink:0;min-width:155px;}
   .bonus-chip-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:2px;}
   .bonus-chip-top{display:flex;align-items:center;gap:10px;}
@@ -88,12 +70,10 @@
   .bonus-total-row{display:flex;align-items:center;gap:6px;padding-top:4px;border-top:1px solid var(--gold-border);}
   .bonus-total-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--gold);opacity:.7;}
   .bonus-total-amt{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--gold);}
-
   .overall-chip{text-align:right;flex-shrink:0;}
   .overall-amt{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--purple);line-height:1;}
   .overall-amt .rm{font-size:12px;margin-right:1px;}
   .overall-pct-row{font-family:'DM Mono',monospace;font-size:10px;color:var(--purple);opacity:.7;margin-top:3px;}
-
   .tiers{display:flex;flex-direction:column;justify-content:center;gap:11px;padding:6px 0;}
   .tier-row{display:flex;align-items:center;gap:10px;}
   .tier-pill{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;width:36px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid;}
@@ -109,27 +89,28 @@
   .ftt1{background:linear-gradient(90deg,#3b82f6,#1a6bc8);}
   .ftt2{background:linear-gradient(90deg,#1a6bc8,#4f46e5);}
   .ftt3{background:linear-gradient(90deg,#4f46e5,#7c3aed);}
-
   .tier-right{display:flex;align-items:center;gap:6px;width:260px;flex-shrink:0;justify-content:flex-end;flex-wrap:nowrap;}
-  .tier-tgt{font-family:"DM Mono",monospace;font-size:11px;color:var(--muted);min-width:80px;text-align:right;}
-  .tier-bonus{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);min-width:70px;text-align:center;}
-  .tier-bonus-pct{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--purple-bg);border:1px solid var(--purple-border);color:var(--purple);min-width:70px;text-align:center;}
-  .tier-pct{font-family:"DM Mono",monospace;font-size:12px;font-weight:500;width:42px;text-align:right;color:var(--text);}
-  .badge{font-family:"DM Mono",monospace;font-size:10px;padding:3px 7px;border-radius:5px;min-width:62px;text-align:center;border:1px solid;white-space:nowrap;}
+  .tier-tgt{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-width:80px;text-align:right;}
+  .tier-bonus{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);min-width:70px;text-align:center;}
+  .tier-bonus-pct{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 6px;border-radius:4px;white-space:nowrap;background:var(--purple-bg);border:1px solid var(--purple-border);color:var(--purple);min-width:70px;text-align:center;}
+  .tier-pct{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;width:42px;text-align:right;color:var(--text);}
+  .badge{font-family:'DM Mono',monospace;font-size:10px;padding:3px 7px;border-radius:5px;min-width:62px;text-align:center;border:1px solid;white-space:nowrap;}
   .bh{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
-  .bc{background:#fff8ec;border-color:#fcd97a;color:var(--amber);}
+  .bc{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
   .bm{background:var(--surface2);border-color:var(--border2);color:var(--muted);}
+  @keyframes glowGold{0%,100%{box-shadow:none}50%{box-shadow:inset 0 0 0 2px var(--gold-border),0 0 30px 3px rgba(200,150,12,.08)}}
+  .glow-gold{animation:glowGold 2.5s infinite;}
 
   /* Clock zone */
-  .clock-zone{border-top:2px solid var(--border);background:var(--surface);display:flex;}
-  .cam-wrap{width:calc(26vh*1.25);flex-shrink:0;position:relative;background:var(--surface2);border-right:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .clock-zone{border-top:2px solid var(--border);background:var(--surface);display:flex;flex-wrap:wrap;}
+  .cam-wrap{width:calc(26vh*1.25);flex-shrink:0;min-height:160px;position:relative;background:var(--surface2);border-right:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;}
   #video{width:100%;height:100%;object-fit:cover;display:none;transform:scaleX(-1);}
   #canvas{display:none;position:absolute;top:0;left:0;width:100%;height:100%;}
   .cam-idle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;pointer-events:none;}
   .cam-idle-icon{font-size:24px;opacity:.18;}
   .cam-idle-text{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted2);}
   .cam-rec{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--red);display:none;animation:blink .8s infinite;}
-  .emp-section{flex:1;display:flex;flex-direction:column;justify-content:center;padding:12px 16px;gap:9px;border-right:1px solid var(--border);}
+  .emp-section{flex:1;min-width:180px;display:flex;flex-direction:column;justify-content:center;padding:12px 16px;gap:9px;border-right:1px solid var(--border);}
   .zone-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
   .emp-grid{display:flex;flex-wrap:wrap;gap:7px;}
   .emp-btn{background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:7px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .12s;white-space:nowrap;}
@@ -140,10 +121,9 @@
   .btn-out{background:var(--bg);border:1.5px solid var(--border2);color:var(--muted);}
   .btn-in:active{transform:scale(.97);}
   .btn-out:hover{border-color:var(--red);color:var(--red);}
-  .feed-section{flex:1;display:flex;flex-direction:column;padding:10px 12px;gap:6px;overflow:hidden;min-width:0;}
-  .feed-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
-  .feed-item{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 9px;background:var(--bg);border:1px solid var(--border);border-radius:7px;animation:fdIn .2s ease;flex-shrink:0;}
-  @keyframes fdIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  .feed-section{flex:1;min-width:120px;display:flex;flex-direction:column;padding:10px 12px;gap:6px;overflow:hidden;}
+  .feed-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;max-height:140px;}
+  .feed-item{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 9px;background:var(--bg);border:1px solid var(--border);border-radius:7px;flex-shrink:0;}
   .fdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
   .fdot-in{background:var(--green);} .fdot-out{background:var(--red);}
   .fname{font-weight:600;} .ftype{font-size:10px;color:var(--muted);}
@@ -152,16 +132,91 @@
   .settings-btn{writing-mode:vertical-rl;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);cursor:pointer;background:none;border:none;padding:8px;transition:color .15s;}
   .settings-btn:hover{color:var(--text);}
 
-  @keyframes glowGold{0%,100%{box-shadow:none}50%{box-shadow:inset 0 0 0 2px var(--gold-border),0 0 30px 3px rgba(200,150,12,.08)}}
-  .glow-gold{animation:glowGold 2.5s infinite;}
+  /* ══════════════════════════════════
+     STOCK COUNT TAB
+  ══════════════════════════════════ */
+  .stock-page{padding:20px;}
+  .stock-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+  .stock-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+  .stock-subtitle{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:3px;}
+  .stock-emp-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .stock-emp-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);}
+  .stock-emp-select{padding:8px 12px;border:1.5px solid var(--border2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--bg);cursor:pointer;outline:none;}
+  .stock-emp-select:focus{border-color:var(--gold);}
 
+  /* Stock table */
+  .stock-table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+  .stock-table th{background:var(--surface2);padding:10px 14px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);}
+  .stock-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
+  .stock-table tr:last-child td{border-bottom:none;}
+  .stock-table tr:hover td{background:var(--surface);}
+  .sku-code{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+  .sku-name{font-weight:500;}
+  .par-badge{font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);background:var(--blue-bg);border:1px solid var(--blue-border);padding:2px 7px;border-radius:4px;}
+  .qty-input{width:80px;padding:7px 10px;border:1.5px solid var(--border2);border-radius:7px;font-family:'DM Mono',monospace;font-size:15px;font-weight:500;text-align:center;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;}
+  .qty-input:focus{border-color:var(--gold);}
+  .qty-input.ok{border-color:var(--green);background:var(--green-bg);}
+  .qty-input.warn{border-color:var(--amber);background:var(--amber-bg);}
+  .qty-input.low{border-color:var(--red);background:var(--red-bg);}
+
+  .stock-footer{margin-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .stock-progress{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);}
+  .stock-progress span{color:var(--text);font-weight:500;}
+  .submit-stock-btn{padding:12px 28px;background:var(--green);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:all .15s;}
+  .submit-stock-btn:hover{opacity:.88;}
+  .submit-stock-btn:disabled{background:var(--muted2);cursor:not-allowed;}
+  .stock-submitted-banner{background:var(--green-bg);border:1px solid var(--green-border);border-radius:10px;padding:14px 18px;font-family:'DM Mono',monospace;font-size:13px;color:var(--green);display:none;}
+
+  /* ══════════════════════════════════
+     REORDER TAB
+  ══════════════════════════════════ */
+  .reorder-page{padding:20px;}
+  .reorder-header{margin-bottom:20px;}
+  .reorder-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+  .reorder-subtitle{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:3px;}
+  .reorder-grid{display:flex;flex-direction:column;gap:10px;}
+  .reorder-card{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:12px;border:1px solid;}
+  .reorder-card.urgent{background:var(--red-bg);border-color:var(--red-border);}
+  .reorder-card.low{background:var(--amber-bg);border-color:var(--amber-border);}
+  .reorder-card.ok{background:var(--green-bg);border-color:var(--green-border);}
+  .reorder-card.pending{background:var(--surface2);border-color:var(--border);}
+  .rc-icon{font-size:20px;flex-shrink:0;}
+  .rc-info{flex:1;min-width:0;}
+  .rc-name{font-weight:600;font-size:14px;}
+  .rc-sku{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:1px;}
+  .rc-right{text-align:right;flex-shrink:0;}
+  .rc-qty{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1;}
+  .rc-qty.urgent{color:var(--red);}
+  .rc-qty.low{color:var(--amber);}
+  .rc-qty.ok{color:var(--green);}
+  .rc-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted);margin-top:2px;}
+  .rc-actual{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:2px;}
+  .reorder-empty{text-align:center;padding:40px;font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);}
+  .reorder-no-count{text-align:center;padding:40px;}
+  .reorder-no-count p{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);margin-bottom:12px;}
+
+  /* Summary bar */
+  .reorder-summary{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .sum-chip{flex:1;min-width:80px;padding:12px 14px;border-radius:10px;text-align:center;border:1px solid;}
+  .sum-chip.urgent{background:var(--red-bg);border-color:var(--red-border);}
+  .sum-chip.low{background:var(--amber-bg);border-color:var(--amber-border);}
+  .sum-chip.ok{background:var(--green-bg);border-color:var(--green-border);}
+  .sum-chip .num{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;}
+  .sum-chip.urgent .num{color:var(--red);}
+  .sum-chip.low .num{color:var(--amber);}
+  .sum-chip.ok .num{color:var(--green);}
+  .sum-chip .lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;margin-top:2px;}
+  .sum-chip.urgent .lbl{color:var(--red);}
+  .sum-chip.low .lbl{color:var(--amber);}
+  .sum-chip.ok .lbl{color:var(--green);}
+
+  /* Shared modals & toasts */
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);padding:9px 22px;border-radius:8px;font-family:'DM Mono',monospace;font-size:13px;opacity:0;transition:all .22s;z-index:200;pointer-events:none;white-space:nowrap;color:#fff;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .toast.ok{background:var(--green);} .toast.err{background:var(--red);} .toast.info{background:var(--text);}
   .flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:99;transition:opacity .06s;}
   .flash.on{opacity:.5;}
 
-  /* Update Sales Modal */
   .update-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
   .update-modal-bg.open{display:flex;}
   .update-modal{background:var(--bg);border:1px solid var(--border2);border-radius:16px;padding:28px;width:min(340px,90vw);display:flex;flex-direction:column;gap:18px;box-shadow:0 20px 60px rgba(0,0,0,.12);}
@@ -172,18 +227,17 @@
   .um-prefix{padding:0 12px;font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--gold);background:var(--gold-bg);border-right:1px solid var(--gold-border);height:52px;display:flex;align-items:center;flex-shrink:0;}
   .um-input{flex:1;height:52px;border:none;outline:none;padding:0 14px;font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text);background:var(--bg);}
   .um-actions{display:flex;gap:8px;}
-  .um-confirm{flex:1;background:var(--green);border:none;border-radius:9px;height:46px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .15s;}
+  .um-confirm{flex:1;background:var(--green);border:none;border-radius:9px;height:46px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer;}
   .um-confirm:hover{opacity:.85;}
   .um-cancel{background:var(--bg);border:1.5px solid var(--border2);border-radius:9px;height:46px;padding:0 18px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--muted);cursor:pointer;}
 
-  /* Setup Modal */
   .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
   .modal-bg.open{display:flex;}
   .modal{background:var(--bg);border:1px solid var(--border2);border-radius:16px;padding:28px;width:min(480px,92vw);max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 60px rgba(0,0,0,.15);}
   .modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
   .fg{display:flex;flex-direction:column;gap:6px;}
   .fl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
-  input[type=text]{background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:9px 11px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;width:100%;outline:none;transition:border-color .15s;}
+  input[type=text]{background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:9px 11px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;width:100%;outline:none;}
   input:focus{border-color:var(--gold);}
   .status-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;line-height:2;font-family:'DM Mono',monospace;}
   .status-box .ok{color:var(--green);} .status-box .er{color:var(--red);} .status-box .warn{color:var(--amber);}
@@ -194,27 +248,44 @@
   .btn-test:hover{border-color:var(--blue);color:var(--blue);}
   .btn-cancel{background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;color:var(--muted);}
   ::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+  /* Mobile */
+  @media (max-width:700px){
+    .sales-zone{flex-direction:column;}
+    .panel-daily{border-right:none;border-bottom:1px solid var(--border);}
+    .big-num .amt{font-size:48px;}
+    .cam-wrap{width:100%!important;border-right:none;border-bottom:1px solid var(--border);}
+    .tier-right{width:auto;}
+    .stock-table th:nth-child(1),.stock-table td:nth-child(1){display:none;}
+  }
 </style>
 </head>
 <body>
-<div class="layout">
 
-  <div class="topbar">
-    <div class="brand">Tong Ah <span>Raya 2026</span></div>
-    <div class="tb-clock" id="liveClock">--:--:--</div>
-    <div class="tb-right">
-      <div class="tb-date" id="liveDate">--</div>
-      <div class="sync-pill" onclick="manualRefresh()" title="Tap to refresh">
-        <div class="sync-dot" id="syncDot"></div>
-        <span id="syncText">SETUP</span>
-      </div>
-      <button class="setup-icon" onclick="openModal()">⚙</button>
+<!-- Topbar -->
+<div class="topbar">
+  <div class="brand">Tong Ah <span>Raya 2026</span></div>
+  <div class="tb-clock" id="liveClock">--:--:--</div>
+  <div class="tb-right">
+    <div class="tb-date" id="liveDate">--</div>
+    <div class="sync-pill" onclick="manualRefresh()" title="Tap to refresh">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncText">SETUP</span>
     </div>
+    <button class="setup-icon" onclick="openModal()">⚙</button>
   </div>
+</div>
 
+<!-- Tab bar -->
+<div class="tabbar">
+  <button class="tab-btn active" onclick="switchTab('sales')">📊 Sales</button>
+  <button class="tab-btn" onclick="switchTab('stock')">📦 點貨</button>
+  <button class="tab-btn" onclick="switchTab('reorder')">🔔 補貨需求</button>
+</div>
+
+<!-- ════════ TAB: SALES ════════ -->
+<div class="tab-panel active" id="tab-sales">
   <div class="sales-zone">
-
-    <!-- LEFT: Daily -->
     <div class="panel panel-daily" id="dailyCard">
       <div class="panel-head">
         <div>
@@ -237,40 +308,11 @@
         </div>
       </div>
       <div class="tiers">
-        <div class="tier-row">
-          <div class="tier-pill pill-d">T1</div>
-          <div class="bar-wrap"><div class="bar-fill ft1" id="t1Bar" style="width:0"></div></div>
-          <div class="tier-right">
-            <span class="tier-tgt" id="t1Tgt">—</span>
-            <span class="tier-bonus" id="t1Bonus">—</span>
-            <span class="tier-pct" id="t1Pct">—</span>
-            <span class="badge bm" id="t1Badge">—</span>
-          </div>
-        </div>
-        <div class="tier-row">
-          <div class="tier-pill pill-d">T2</div>
-          <div class="bar-wrap"><div class="bar-fill ft2" id="t2Bar" style="width:0"></div></div>
-          <div class="tier-right">
-            <span class="tier-tgt" id="t2Tgt">—</span>
-            <span class="tier-bonus" id="t2Bonus">—</span>
-            <span class="tier-pct" id="t2Pct">—</span>
-            <span class="badge bm" id="t2Badge">—</span>
-          </div>
-        </div>
-        <div class="tier-row">
-          <div class="tier-pill pill-d">T3</div>
-          <div class="bar-wrap"><div class="bar-fill ft3" id="t3Bar" style="width:0"></div></div>
-          <div class="tier-right">
-            <span class="tier-tgt" id="t3Tgt">—</span>
-            <span class="tier-bonus" id="t3Bonus">—</span>
-            <span class="tier-pct" id="t3Pct">—</span>
-            <span class="badge bm" id="t3Badge">—</span>
-          </div>
-        </div>
+        <div class="tier-row"><div class="tier-pill pill-d">T1</div><div class="bar-wrap"><div class="bar-fill ft1" id="t1Bar" style="width:0"></div></div><div class="tier-right"><span class="tier-tgt" id="t1Tgt">—</span><span class="tier-bonus" id="t1Bonus">—</span><span class="tier-pct" id="t1Pct">—</span><span class="badge bm" id="t1Badge">—</span></div></div>
+        <div class="tier-row"><div class="tier-pill pill-d">T2</div><div class="bar-wrap"><div class="bar-fill ft2" id="t2Bar" style="width:0"></div></div><div class="tier-right"><span class="tier-tgt" id="t2Tgt">—</span><span class="tier-bonus" id="t2Bonus">—</span><span class="tier-pct" id="t2Pct">—</span><span class="badge bm" id="t2Badge">—</span></div></div>
+        <div class="tier-row"><div class="tier-pill pill-d">T3</div><div class="bar-wrap"><div class="bar-fill ft3" id="t3Bar" style="width:0"></div></div><div class="tier-right"><span class="tier-tgt" id="t3Tgt">—</span><span class="tier-bonus" id="t3Bonus">—</span><span class="tier-pct" id="t3Pct">—</span><span class="badge bm" id="t3Badge">—</span></div></div>
       </div>
     </div>
-
-    <!-- RIGHT: Total -->
     <div class="panel">
       <div class="panel-head">
         <div>
@@ -284,56 +326,23 @@
         </div>
       </div>
       <div class="tiers">
-        <div class="tier-row">
-          <div class="tier-pill pill-t">TT1</div>
-          <div class="bar-wrap"><div class="bar-fill ftt1" id="tt1Bar" style="width:0"></div></div>
-          <div class="tier-right">
-            <span class="tier-tgt" id="tt1Tgt">—</span>
-            <span class="tier-bonus-pct" id="tt1BonusPct">—</span>
-            <span class="tier-pct" id="tt1Pct">—</span>
-            <span class="badge bm" id="tt1Badge">—</span>
-          </div>
-        </div>
-        <div class="tier-row">
-          <div class="tier-pill pill-t">TT2</div>
-          <div class="bar-wrap"><div class="bar-fill ftt2" id="tt2Bar" style="width:0"></div></div>
-          <div class="tier-right">
-            <span class="tier-tgt" id="tt2Tgt">—</span>
-            <span class="tier-bonus-pct" id="tt2BonusPct">—</span>
-            <span class="tier-pct" id="tt2Pct">—</span>
-            <span class="badge bm" id="tt2Badge">—</span>
-          </div>
-        </div>
-        <div class="tier-row">
-          <div class="tier-pill pill-t">TT3</div>
-          <div class="bar-wrap"><div class="bar-fill ftt3" id="tt3Bar" style="width:0"></div></div>
-          <div class="tier-right">
-            <span class="tier-tgt" id="tt3Tgt">—</span>
-            <span class="tier-bonus-pct" id="tt3BonusPct">—</span>
-            <span class="tier-pct" id="tt3Pct">—</span>
-            <span class="badge bm" id="tt3Badge">—</span>
-          </div>
-        </div>
+        <div class="tier-row"><div class="tier-pill pill-t">TT1</div><div class="bar-wrap"><div class="bar-fill ftt1" id="tt1Bar" style="width:0"></div></div><div class="tier-right"><span class="tier-tgt" id="tt1Tgt">—</span><span class="tier-bonus-pct" id="tt1BonusPct">—</span><span class="tier-pct" id="tt1Pct">—</span><span class="badge bm" id="tt1Badge">—</span></div></div>
+        <div class="tier-row"><div class="tier-pill pill-t">TT2</div><div class="bar-wrap"><div class="bar-fill ftt2" id="tt2Bar" style="width:0"></div></div><div class="tier-right"><span class="tier-tgt" id="tt2Tgt">—</span><span class="tier-bonus-pct" id="tt2BonusPct">—</span><span class="tier-pct" id="tt2Pct">—</span><span class="badge bm" id="tt2Badge">—</span></div></div>
+        <div class="tier-row"><div class="tier-pill pill-t">TT3</div><div class="bar-wrap"><div class="bar-fill ftt3" id="tt3Bar" style="width:0"></div></div><div class="tier-right"><span class="tier-tgt" id="tt3Tgt">—</span><span class="tier-bonus-pct" id="tt3BonusPct">—</span><span class="tier-pct" id="tt3Pct">—</span><span class="badge bm" id="tt3Badge">—</span></div></div>
       </div>
     </div>
   </div>
-
   <!-- Clock zone -->
   <div class="clock-zone">
-    <div class="cam-wrap" id="camWrap">
+    <div class="cam-wrap" style="min-height:160px;">
       <video id="video" autoplay playsinline muted></video>
       <canvas id="canvas"></canvas>
-      <div class="cam-idle" id="camIdle">
-        <div class="cam-idle-icon">📷</div>
-        <div class="cam-idle-text">SELECT EMPLOYEE</div>
-      </div>
+      <div class="cam-idle" id="camIdle"><div class="cam-idle-icon">📷</div><div class="cam-idle-text">SELECT EMPLOYEE</div></div>
       <div class="cam-rec" id="camRec"></div>
     </div>
     <div class="emp-section">
       <div class="zone-label">Select Employee</div>
-      <div class="emp-grid" id="empGrid">
-        <div style="font-size:12px;color:var(--muted)">Loading…</div>
-      </div>
+      <div class="emp-grid" id="empGrid"><div style="font-size:12px;color:var(--muted)">Loading…</div></div>
     </div>
     <div class="punch-section">
       <div class="zone-label">Punch</div>
@@ -344,12 +353,66 @@
       <div class="zone-label">Recent</div>
       <div class="feed-scroll" id="feedScroll"></div>
     </div>
-    <div class="settings-col">
-      <button class="settings-btn" onclick="openModal()">⚙ SETUP</button>
+    <div class="settings-col"><button class="settings-btn" onclick="openModal()">⚙ SETUP</button></div>
+  </div>
+</div>
+
+<!-- ════════ TAB: 點貨 ════════ -->
+<div class="tab-panel" id="tab-stock">
+  <div class="stock-page">
+    <div class="stock-header">
+      <div>
+        <div class="stock-title">📦 Evening Stock Count</div>
+        <div class="stock-subtitle" id="stockSubtitle">Raya 2026 · Loading…</div>
+      </div>
+      <div class="stock-emp-row">
+        <span class="stock-emp-label">DONE BY</span>
+        <select class="stock-emp-select" id="stockEmpSelect">
+          <option value="">Select Employee</option>
+        </select>
+      </div>
+    </div>
+    <div class="stock-submitted-banner" id="stockSubmittedBanner">
+      ✅ Tonight's stock count has been submitted. Thank you!
+    </div>
+    <table class="stock-table">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Product</th>
+          <th>Unit</th>
+          <th style="text-align:center">PAR</th>
+          <th style="text-align:center">Actual Qty</th>
+          <th style="text-align:center">Status</th>
+        </tr>
+      </thead>
+      <tbody id="stockTableBody">
+        <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;">Loading products…</td></tr>
+      </tbody>
+    </table>
+    <div class="stock-footer">
+      <div class="stock-progress">Filled: <span id="stockFilled">0</span> / <span id="stockTotal">0</span></div>
+      <button class="submit-stock-btn" id="submitStockBtn" onclick="submitStock()">Submit Stock Count</button>
     </div>
   </div>
+</div>
 
-</div><!-- /layout -->
+<!-- ════════ TAB: 補貨需求 ════════ -->
+<div class="tab-panel" id="tab-reorder">
+  <div class="reorder-page">
+    <div class="reorder-header">
+      <div class="reorder-title">🔔 Reorder Requirements</div>
+      <div class="reorder-subtitle" id="reorderSubtitle">Based on last stock count</div>
+    </div>
+    <div class="reorder-summary" id="reorderSummary"></div>
+    <div class="reorder-grid" id="reorderGrid">
+      <div class="reorder-no-count">
+        <p>No stock count submitted yet today.</p>
+        <button class="submit-stock-btn" onclick="switchTab('stock')" style="background:var(--blue)">Go to Stock Count →</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="flash" id="flash"></div>
 <div class="toast" id="toast"></div>
@@ -357,18 +420,9 @@
 <!-- Update Sales Modal -->
 <div class="update-modal-bg" id="updateModalBg">
   <div class="update-modal">
-    <div>
-      <div class="um-title">Update Today's Sales</div>
-      <div class="um-sub">Saves directly to Google Sheets</div>
-    </div>
-    <div class="um-input-wrap">
-      <div class="um-prefix">RM</div>
-      <input class="um-input" id="umInput" type="number" placeholder="0" min="0" inputmode="decimal">
-    </div>
-    <div class="um-actions">
-      <button class="um-confirm" onclick="confirmUpdate()">Confirm</button>
-      <button class="um-cancel"  onclick="closeUpdateModal()">Cancel</button>
-    </div>
+    <div><div class="um-title">Update Today's Sales</div><div class="um-sub">Saves directly to Google Sheets</div></div>
+    <div class="um-input-wrap"><div class="um-prefix">RM</div><input class="um-input" id="umInput" type="number" placeholder="0" min="0" inputmode="decimal"></div>
+    <div class="um-actions"><button class="um-confirm" onclick="confirmUpdate()">Confirm</button><button class="um-cancel" onclick="closeUpdateModal()">Cancel</button></div>
   </div>
 </div>
 
@@ -376,10 +430,7 @@
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <div class="modal-title">Connect Google Sheets</div>
-    <div class="fg">
-      <div class="fl">Apps Script URL</div>
-      <input id="s_url" type="text" placeholder="https://script.google.com/macros/s/XXXXX/exec">
-    </div>
+    <div class="fg"><div class="fl">Apps Script URL</div><input id="s_url" type="text" placeholder="https://script.google.com/macros/s/XXXXX/exec"></div>
     <div class="status-box" id="statusBox">Paste your URL and click Test</div>
     <div class="ma">
       <button class="btn-test" onclick="testConn()">Test Connection</button>
@@ -390,17 +441,43 @@
 </div>
 
 <script>
-// ── URL hardcoded — always use this, overrides localStorage ──
 var SHEET_URL = "https://script.google.com/macros/s/AKfycbwx9VQrymei3hxjD4EClzCFt9C9pl_bA8Xeb0oKYsXo-EyinKyoJ_wNVoXFG8kne8Up/exec";
+var selEmp=null, camStream=null, syncTimer=null, lastData=null, stockData=null;
 
-var selEmp = null, camStream = null, syncTimer = null, lastData = null;
-
+// ── Clock ──────────────────────────────────────────────────
 function tick(){
   var n=new Date();
   document.getElementById("liveClock").textContent=n.toLocaleTimeString("en-MY",{hour12:false});
   document.getElementById("liveDate").textContent=n.toLocaleDateString("en-MY",{weekday:"short",day:"numeric",month:"short"});
 }
 
+// ── Tab switching ──────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll(".tab-panel").forEach(function(p){p.classList.remove("active");});
+  document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+  document.getElementById("tab-"+name).classList.add("active");
+  event.currentTarget.classList.add("active");
+  if(name==="stock") loadStockTab();
+  if(name==="reorder") loadReorderTab();
+}
+
+// ── JSONP ──────────────────────────────────────────────────
+function jsonpFetch(url){
+  return new Promise(function(resolve,reject){
+    var cb="_cb_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+    var s=document.createElement("script");
+    var t=setTimeout(function(){cleanup();reject(new Error("Timeout"));},12000);
+    function cleanup(){clearTimeout(t);delete window[cb];if(s.parentNode)s.parentNode.removeChild(s);}
+    window[cb]=function(d){cleanup();resolve(d);};
+    s.onerror=function(){cleanup();reject(new Error("Script failed"));};
+    s.src=url+(url.indexOf("?")>=0?"&":"?")+"callback="+cb+"&_t="+Date.now();
+    document.head.appendChild(s);
+  });
+}
+
+function setSyncUI(s,l){document.getElementById("syncDot").className="sync-dot"+(s?" "+s:"");document.getElementById("syncText").textContent=l;}
+
+// ── Sales Data ─────────────────────────────────────────────
 function animN(el,to){
   if(isNaN(to)) return;
   var from=parseFloat(el.textContent.replace(/[RM,—%]/g,""))||0;
@@ -419,18 +496,15 @@ function setBadge(el,cur,tgt){
 
 function renderDash(d){
   lastData=d;
-  var ds=d.daily_sales||0;
-  var ts=(d.total_sales||0)+ds;   // historical C col + today B col
+  var ds=d.daily_sales||0, ts=d.total_sales||0;  // C col already includes today
   var t1=d.t1||0,t2=d.t2||0,t3=d.t3||0;
-  var b1=d.bonus1||0,b2=d.bonus2||0,b3=d.bonus3||0;
-  var tb=d.total_bonus||0;
+  var b1=d.bonus1||0,b2=d.bonus2||0,b3=d.bonus3||0,tb=d.total_bonus||0;
   var tt1=d.tt1||0,tt2=d.tt2||0,tt3=d.tt3||0;
   var p1=d.tt1_pct||0,p2=d.tt2_pct||0,p3=d.tt3_pct||0;
 
   animN(document.getElementById("dailyAmt"),ds);
   animN(document.getElementById("totalAmt"),ts);
 
-  // Daily tiers
   function dailyTier(bId,pId,tId,boId,bdId,cur,tgt,bonus){
     var pct=tgt?Math.min(cur/tgt*100,100):0;
     document.getElementById(bId).style.width=pct+"%";
@@ -443,7 +517,6 @@ function renderDash(d){
   dailyTier("t2Bar","t2Pct","t2Tgt","t2Bonus","t2Badge",ds,t2,b2);
   dailyTier("t3Bar","t3Pct","t3Tgt","t3Bonus","t3Badge",ds,t3,b3);
 
-  // Daily Bonus chip — non-cumulative
   var cA=document.getElementById("commAmt"),cS=document.getElementById("commStatus"),dc=document.getElementById("dailyCard");
   var earned=0;
   if(t3&&ds>=t3)     {earned=b3;cS.textContent="T3 Hit!";cS.className="badge bh";dc.classList.add("glow-gold");}
@@ -451,11 +524,8 @@ function renderDash(d){
   else if(t1&&ds>=t1){earned=b1;cS.textContent="T1 Hit!";cS.className="badge bc";dc.classList.add("glow-gold");}
   else               {earned=0; cS.textContent="Not yet"; cS.className="badge bm";dc.classList.remove("glow-gold");}
   animN(cA,earned);
+  document.getElementById("totalBonusAmt").textContent=(tb+earned).toLocaleString();
 
-  // Total Bonus = J col (history) + today earned — realtime
-  document.getElementById("totalBonusAmt").textContent=(tb+earned).toLocaleString()||"—";
-
-  // Total tiers
   function totalTier(bId,pId,tId,bpId,bdId,cur,tgt,rate){
     var pct=tgt?Math.min(cur/tgt*100,100):0;
     document.getElementById(bId).style.width=pct+"%";
@@ -468,114 +538,31 @@ function renderDash(d){
   totalTier("tt2Bar","tt2Pct","tt2Tgt","tt2BonusPct","tt2Badge",ts,tt2,p2);
   totalTier("tt3Bar","tt3Pct","tt3Tgt","tt3BonusPct","tt3Badge",ts,tt3,p3);
 
-  // Overall Comm: base 0.5% always, unlocked TT tiers upgrade the rate
-  var BASE_PCT = 0.5;
-  var activePct = BASE_PCT;  // minimum always 0.5%
-  var tierLabel = BASE_PCT + "% (base)";
-  if(p3 && ts>=tt3)      { activePct=p3; tierLabel=p3+"% (TT3 unlocked)"; }
-  else if(p2 && ts>=tt2) { activePct=p2; tierLabel=p2+"% (TT2 unlocked)"; }
-  else if(p1 && ts>=tt1) { activePct=p1; tierLabel=p1+"% (TT1 unlocked)"; }
-  var calcComm = ts ? parseFloat((ts * activePct / 100).toFixed(2)) : 0;
-  // Display with 2 decimal places
-  document.getElementById("overallComm").textContent = calcComm.toLocaleString("en-MY", {minimumFractionDigits:2, maximumFractionDigits:2});
-  document.getElementById("overallPctRow").textContent =
-    ts ? tierLabel + " × RM " + ts.toLocaleString() : "—";
+  var BASE=0.5, activePct=BASE, tierLabel=BASE+"% (base)";
+  if(p3&&ts>=tt3)     {activePct=p3;tierLabel=p3+"% (TT3 unlocked)";}
+  else if(p2&&ts>=tt2){activePct=p2;tierLabel=p2+"% (TT2 unlocked)";}
+  else if(p1&&ts>=tt1){activePct=p1;tierLabel=p1+"% (TT1 unlocked)";}
+  var calcComm=ts?parseFloat((ts*activePct/100).toFixed(2)):0;
+  document.getElementById("overallComm").textContent=calcComm.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById("overallPctRow").textContent=ts?tierLabel+" × RM "+ts.toLocaleString():"—";
 }
 
 function renderEmps(emps){
   var g=document.getElementById("empGrid"); g.innerHTML="";
-  if(!emps||!emps.length){g.innerHTML="<div style=\"font-size:12px;color:var(--muted)\">No employees found</div>";return;}
+  var sel=document.getElementById("stockEmpSelect");
+  // Keep first option
+  while(sel.options.length>1) sel.remove(1);
+  if(!emps||!emps.length){g.innerHTML="<div style=\"font-size:12px;color:var(--muted)\">No employees</div>";return;}
   for(var i=0;i<emps.length;i++){
     (function(name){
       var b=document.createElement("button"); b.className="emp-btn"; b.textContent=name;
       b.onclick=function(){selEmp=name;document.querySelectorAll(".emp-btn").forEach(function(x){x.classList.remove("sel");});b.classList.add("sel");startCam();};
       g.appendChild(b);
+      var opt=document.createElement("option"); opt.value=name; opt.textContent=name;
+      sel.appendChild(opt);
     })(emps[i]);
   }
 }
-
-// ── Update Sales — writes back to Sheets ──────────────────
-function openUpdateModal(){
-  var cur=(lastData&&lastData.daily_sales)?lastData.daily_sales:0;
-  document.getElementById("umInput").value=cur||"";
-  document.getElementById("updateModalBg").classList.add("open");
-  setTimeout(function(){var el=document.getElementById("umInput");el.focus();el.select();},100);
-}
-function closeUpdateModal(){document.getElementById("updateModalBg").classList.remove("open");}
-
-function confirmUpdate(){
-  var val=parseFloat(document.getElementById("umInput").value);
-  if(isNaN(val)||val<0){showToast("Please enter a valid amount","err");return;}
-
-  // Update local display immediately
-  if(lastData){lastData.daily_sales=val;renderDash(lastData);}
-  closeUpdateModal();
-  showToast("Saving to Sheets…","info");
-
-  // Write back to Sheets via POST
-  fetch(SHEET_URL,{
-    method:"POST",
-    redirect:"follow",
-    headers:{"Content-Type":"text/plain;charset=utf-8"},
-    body:JSON.stringify({action:"updateSales",daily_sales:val})
-  }).then(function(){
-    showToast("Saved RM "+val.toLocaleString()+" to Sheets ✓","ok");
-  }).catch(function(){
-    showToast("Display updated (Sheets sync failed)","err");
-  });
-}
-
-document.addEventListener("DOMContentLoaded",function(){
-  document.getElementById("umInput").addEventListener("keydown",function(e){
-    if(e.key==="Enter") confirmUpdate();
-    if(e.key==="Escape") closeUpdateModal();
-  });
-});
-
-// Camera
-function startCam(){
-  if(camStream) return;
-  navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}})
-    .then(function(stream){
-      camStream=stream; var v=document.getElementById("video"); v.srcObject=stream; v.style.display="block";
-      document.getElementById("camIdle").style.display="none";
-      document.getElementById("camRec").style.display="block";
-    }).catch(function(){
-      document.getElementById("camIdle").innerHTML="<div class=\"cam-idle-icon\" style=\"opacity:.1\">📷</div><div class=\"cam-idle-text\">NO CAMERA</div>";
-    });
-}
-function stopCam(){
-  if(!camStream) return;
-  camStream.getTracks().forEach(function(t){t.stop();}); camStream=null;
-  var v=document.getElementById("video"); v.srcObject=null; v.style.display="none";
-  var idle=document.getElementById("camIdle");
-  idle.style.display="flex";
-  idle.innerHTML="<div class=\"cam-idle-icon\">📷</div><div class=\"cam-idle-text\">SELECT EMPLOYEE</div>";
-  document.getElementById("camRec").style.display="none";
-}
-function capturePhoto(){
-  var v=document.getElementById("video"),c=document.getElementById("canvas");
-  if(!camStream||v.readyState<2) return null;
-  c.width=v.videoWidth; c.height=v.videoHeight;
-  var ctx=c.getContext("2d"); ctx.translate(c.width,0); ctx.scale(-1,1); ctx.drawImage(v,0,0);
-  return c.toDataURL("image/jpeg",.6);
-}
-
-// JSONP
-function jsonpFetch(url){
-  return new Promise(function(resolve,reject){
-    var cbName="_cb_"+Date.now()+"_"+Math.random().toString(36).slice(2);
-    var script=document.createElement("script");
-    var timer=setTimeout(function(){cleanup();reject(new Error("Timeout"));},10000);
-    function cleanup(){clearTimeout(timer);delete window[cbName];if(script.parentNode)script.parentNode.removeChild(script);}
-    window[cbName]=function(data){cleanup();resolve(data);};
-    script.onerror=function(){cleanup();reject(new Error("Script failed — check deployment"));};
-    script.src=url+(url.indexOf("?")>=0?"&":"?")+"callback="+cbName+"&_t="+Date.now();
-    document.head.appendChild(script);
-  });
-}
-
-function setSyncUI(s,l){document.getElementById("syncDot").className="sync-dot"+(s?" "+s:"");document.getElementById("syncText").textContent=l;}
 
 async function fetchSheets(silent){
   setSyncUI("spin","SYNCING");
@@ -594,6 +581,194 @@ async function fetchSheets(silent){
 function manualRefresh(){fetchSheets(false);}
 function startAutoSync(){fetchSheets(true);syncTimer=setInterval(function(){fetchSheets(true);},60000);}
 
+// ── Stock Tab ──────────────────────────────────────────────
+var stockProducts=[];
+
+async function loadStockTab(){
+  var tbody=document.getElementById("stockTableBody");
+  tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--muted);font-family:DM Mono,monospace;font-size:12px;">Loading…</td></tr>';
+  try{
+    var d=await jsonpFetch(SHEET_URL+"?action=stock");
+    stockData=d;
+    stockProducts=d.products||[];
+    var date=d.date||"";
+    document.getElementById("stockSubtitle").textContent=d.store+" · "+date;
+    renderStockTable(stockProducts,d.submitted);
+  }catch(err){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--red);font-size:12px;">Failed to load: '+err.message+'</td></tr>';
+  }
+}
+
+function renderStockTable(products, alreadySubmitted){
+  var tbody=document.getElementById("stockTableBody");
+  tbody.innerHTML="";
+  document.getElementById("stockTotal").textContent=products.length;
+  document.getElementById("stockSubmittedBanner").style.display=alreadySubmitted?"block":"none";
+
+  for(var i=0;i<products.length;i++){
+    var p=products[i];
+    var tr=document.createElement("tr");
+    var val=p.actual!==null?p.actual:"";
+    var statusHtml=getStockStatus(p.actual,p.par);
+    tr.innerHTML='<td class="sku-code">'+p.sku+'</td>'
+      +'<td class="sku-name">'+p.name+'</td>'
+      +'<td style="color:var(--muted);font-size:13px">'+p.unit+'</td>'
+      +'<td style="text-align:center"><span class="par-badge">'+p.par+'</span></td>'
+      +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="—" value="'+(val!==""?val:"")+'" data-idx="'+i+'" onchange="onQtyChange(this)" oninput="onQtyChange(this)"></td>'
+      +'<td style="text-align:center" id="status-'+i+'">'+statusHtml+'</td>';
+    tbody.appendChild(tr);
+  }
+  updateStockProgress();
+}
+
+function getStockStatus(actual, par){
+  if(actual===null||actual==="") return '<span style="color:var(--muted);font-size:12px">—</span>';
+  var n=Number(actual);
+  if(n>=par)    return '<span style="color:var(--green);font-size:13px">✅ OK</span>';
+  var short=par-n;
+  if(n>=par*0.5) return '<span style="color:var(--amber);font-size:13px">⚠️ Need '+short+'</span>';
+  return '<span style="color:var(--red);font-size:13px">🔴 Need '+short+'</span>';
+}
+
+function onQtyChange(input){
+  var idx=parseInt(input.dataset.idx);
+  var val=input.value===""?null:Number(input.value);
+  stockProducts[idx].actual=val;
+  // Color the input
+  if(val===null){input.className="qty-input";}
+  else if(val>=stockProducts[idx].par){input.className="qty-input ok";}
+  else if(val>=stockProducts[idx].par*0.5){input.className="qty-input warn";}
+  else{input.className="qty-input low";}
+  // Update status cell
+  document.getElementById("status-"+idx).innerHTML=getStockStatus(val,stockProducts[idx].par);
+  updateStockProgress();
+}
+
+function updateStockProgress(){
+  var filled=stockProducts.filter(function(p){return p.actual!==null;}).length;
+  document.getElementById("stockFilled").textContent=filled;
+  document.getElementById("submitStockBtn").disabled=(filled===0);
+}
+
+async function submitStock(){
+  var emp=document.getElementById("stockEmpSelect").value;
+  if(!emp){showToast("Please select who is doing the count","err");return;}
+  var filled=stockProducts.filter(function(p){return p.actual!==null;});
+  if(filled.length===0){showToast("Please enter at least one quantity","err");return;}
+
+  var btn=document.getElementById("submitStockBtn");
+  btn.disabled=true; btn.textContent="Saving…";
+
+  try{
+    await fetch(SHEET_URL,{
+      method:"POST", redirect:"follow",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({
+        action:"submitStock",
+        employee:emp,
+        store:"Raya 2026",
+        items:filled.map(function(p){return {sku:p.sku,name:p.name,actual:p.actual,par:p.par};})
+      })
+    });
+    document.getElementById("stockSubmittedBanner").style.display="block";
+    showToast("Stock count saved! "+filled.length+" items","ok");
+    btn.textContent="✅ Submitted";
+    // Refresh reorder tab data
+    stockData=null;
+  }catch(err){
+    showToast("Save failed: "+err.message,"err");
+    btn.disabled=false; btn.textContent="Submit Stock Count";
+  }
+}
+
+// ── Reorder Tab ────────────────────────────────────────────
+async function loadReorderTab(){
+  // If we don't have fresh stock data, fetch it
+  if(!stockData){
+    try{ stockData=await jsonpFetch(SHEET_URL+"?action=stock"); }
+    catch(err){ return; }
+  }
+  var products=stockData.products||[];
+  var date=stockData.date||"";
+  document.getElementById("reorderSubtitle").textContent="Based on stock count · "+date;
+
+  var urgent=[],low=[],ok=[];
+  products.forEach(function(p){
+    if(p.actual===null) return;
+    var n=Number(p.actual), par=p.par, short=par-n;
+    if(n>=par) ok.push(p);
+    else if(n>=par*0.5) low.push({p:p,short:short});
+    else urgent.push({p:p,short:short});
+  });
+
+  // Summary chips
+  var sum=document.getElementById("reorderSummary");
+  sum.innerHTML='<div class="sum-chip urgent"><div class="num">'+urgent.length+'</div><div class="lbl">URGENT</div></div>'
+    +'<div class="sum-chip low"><div class="num">'+low.length+'</div><div class="lbl">LOW</div></div>'
+    +'<div class="sum-chip ok"><div class="num">'+ok.length+'</div><div class="lbl">SUFFICIENT</div></div>';
+
+  var grid=document.getElementById("reorderGrid");
+  if(!stockData.submitted && products.every(function(p){return p.actual===null;})){
+    grid.innerHTML='<div class="reorder-no-count"><p>No stock count submitted yet today.</p><button class="submit-stock-btn" onclick="switchTab(\'stock\')" style="background:var(--blue)">Go to Stock Count →</button></div>';
+    return;
+  }
+  if(urgent.length===0&&low.length===0&&ok.length===0){
+    grid.innerHTML='<div class="reorder-empty">No stock count data yet for today.</div>';
+    return;
+  }
+
+  var html="";
+  urgent.forEach(function(item){
+    html+='<div class="reorder-card urgent"><div class="rc-icon">🔴</div><div class="rc-info"><div class="rc-name">'+item.p.name+'</div><div class="rc-sku">'+item.p.sku+' · '+item.p.unit+'</div></div><div class="rc-right"><div class="rc-qty urgent">+'+item.short+'</div><div class="rc-label">TO REORDER</div><div class="rc-actual">Have: '+item.p.actual+' / PAR: '+item.p.par+'</div></div></div>';
+  });
+  low.forEach(function(item){
+    html+='<div class="reorder-card low"><div class="rc-icon">⚠️</div><div class="rc-info"><div class="rc-name">'+item.p.name+'</div><div class="rc-sku">'+item.p.sku+' · '+item.p.unit+'</div></div><div class="rc-right"><div class="rc-qty low">+'+item.short+'</div><div class="rc-label">TO REORDER</div><div class="rc-actual">Have: '+item.p.actual+' / PAR: '+item.p.par+'</div></div></div>';
+  });
+  ok.forEach(function(item){
+    html+='<div class="reorder-card ok"><div class="rc-icon">✅</div><div class="rc-info"><div class="rc-name">'+item.name+'</div><div class="rc-sku">'+item.sku+' · '+item.unit+'</div></div><div class="rc-right"><div class="rc-qty ok">'+item.actual+'</div><div class="rc-label">IN STOCK</div><div class="rc-actual">PAR: '+item.par+'</div></div></div>';
+  });
+  grid.innerHTML=html;
+}
+
+// ── Sales Update ───────────────────────────────────────────
+function openUpdateModal(){
+  var cur=(lastData&&lastData.daily_sales)?lastData.daily_sales:0;
+  document.getElementById("umInput").value=cur||"";
+  document.getElementById("updateModalBg").classList.add("open");
+  setTimeout(function(){var el=document.getElementById("umInput");el.focus();el.select();},100);
+}
+function closeUpdateModal(){document.getElementById("updateModalBg").classList.remove("open");}
+function confirmUpdate(){
+  var val=parseFloat(document.getElementById("umInput").value);
+  if(isNaN(val)||val<0){showToast("Please enter a valid amount","err");return;}
+  if(lastData){lastData.daily_sales=val;renderDash(lastData);}
+  closeUpdateModal(); showToast("Saving…","info");
+  fetch(SHEET_URL,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({action:"updateSales",daily_sales:val})
+  }).then(function(){showToast("Saved RM "+val.toLocaleString()+" ✓","ok");}).catch(function(){showToast("Display updated (sync failed)","err");});
+}
+document.addEventListener("DOMContentLoaded",function(){
+  document.getElementById("umInput").addEventListener("keydown",function(e){if(e.key==="Enter")confirmUpdate();if(e.key==="Escape")closeUpdateModal();});
+});
+
+// ── Camera ─────────────────────────────────────────────────
+function startCam(){
+  if(camStream) return;
+  navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}})
+    .then(function(stream){camStream=stream;var v=document.getElementById("video");v.srcObject=stream;v.style.display="block";document.getElementById("camIdle").style.display="none";document.getElementById("camRec").style.display="block";})
+    .catch(function(){document.getElementById("camIdle").innerHTML='<div class="cam-idle-icon" style="opacity:.1">📷</div><div class="cam-idle-text">NO CAMERA</div>';});
+}
+function stopCam(){
+  if(!camStream) return;
+  camStream.getTracks().forEach(function(t){t.stop();}); camStream=null;
+  var v=document.getElementById("video"); v.srcObject=null; v.style.display="none";
+  document.getElementById("camIdle").style.display="flex";
+  document.getElementById("camIdle").innerHTML='<div class="cam-idle-icon">📷</div><div class="cam-idle-text">SELECT EMPLOYEE</div>';
+  document.getElementById("camRec").style.display="none";
+}
+function capturePhoto(){var v=document.getElementById("video"),c=document.getElementById("canvas");if(!camStream||v.readyState<2)return null;c.width=v.videoWidth;c.height=v.videoHeight;var ctx=c.getContext("2d");ctx.translate(c.width,0);ctx.scale(-1,1);ctx.drawImage(v,0,0);return c.toDataURL("image/jpeg",.6);}
+
+// ── Clock action ───────────────────────────────────────────
 function doAction(type){
   if(!selEmp){showToast("Please select employee","err");return;}
   capturePhoto();
@@ -606,43 +781,35 @@ function doAction(type){
   fetch(SHEET_URL,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({name:selEmp,type:type,date:ds,time:ts})}).catch(function(){});
   setTimeout(function(){selEmp=null;document.querySelectorAll(".emp-btn").forEach(function(b){b.classList.remove("sel");});stopCam();},1500);
 }
-
 function addFeed(name,type,time){
   var f=document.getElementById("feedScroll");
   var el=document.createElement("div"); el.className="feed-item";
-  el.innerHTML="<div class=\"fdot "+(type==="IN"?"fdot-in":"fdot-out")+"\"></div><span class=\"fname\">"+name+"</span><span class=\"ftype\">"+type+"</span><span class=\"ftime\">"+time+"</span>";
+  el.innerHTML='<div class="fdot '+(type==="IN"?"fdot-in":"fdot-out")+'"></div><span class="fname">'+name+'</span><span class="ftype">'+type+'</span><span class="ftime">'+time+'</span>';
   f.insertBefore(el,f.firstChild);
   while(f.children.length>15) f.removeChild(f.lastChild);
 }
 
+// ── Toast ──────────────────────────────────────────────────
 function showToast(msg,type){
-  var t=document.getElementById("toast");
-  t.textContent=msg; t.className="toast "+(type||"info");
+  var t=document.getElementById("toast"); t.textContent=msg; t.className="toast "+(type||"info");
   void t.offsetWidth; t.classList.add("show");
   setTimeout(function(){t.classList.remove("show");},2500);
 }
 
-// Setup modal (for manual URL override if ever needed)
+// ── Setup modal ────────────────────────────────────────────
 function openModal(){document.getElementById("s_url").value=SHEET_URL;document.getElementById("modalBg").classList.add("open");}
 function closeModal(){document.getElementById("modalBg").classList.remove("open");}
 async function testConn(){
-  var url=document.getElementById("s_url").value.trim();
-  var box=document.getElementById("statusBox");
-  if(!url.endsWith("/exec")){box.innerHTML="<span class=\"warn\">⚠ URL must end with /exec</span>";return;}
-  box.innerHTML="<span class=\"warn\">Testing…</span>";
+  var url=document.getElementById("s_url").value.trim(), box=document.getElementById("statusBox");
+  if(!url.endsWith("/exec")){box.innerHTML='<span class="warn">⚠ URL must end with /exec</span>';return;}
+  box.innerHTML='<span class="warn">Testing…</span>';
   try{
     var d=await jsonpFetch(url);
-    box.innerHTML="<span class=\"ok\">✓ Connected!</span><br>Daily: RM "+(d.daily_sales||0)+" | Today row: "+(d.ok?"Found ✓":"Not found")+"<br>Employees: "+((d.employees||[]).join(", ")||"none");
+    box.innerHTML='<span class="ok">✓ Connected!</span><br>Daily: RM '+(d.daily_sales||0)+' | Today: '+(d.ok?"Found ✓":"Not found")+'<br>Employees: '+((d.employees||[]).join(", ")||"none");
     setSyncUI("ok","LIVE"); renderDash(d); renderEmps(d.employees||[]);
-  }catch(err){
-    box.innerHTML="<span class=\"er\">✗ "+err.message+"</span>";
-    setSyncUI("err","ERROR");
-  }
+  }catch(err){box.innerHTML='<span class="er">✗ '+err.message+'</span>';setSyncUI("err","ERROR");}
 }
-function saveSettings(){
-  SHEET_URL=document.getElementById("s_url").value.trim();
-  closeModal(); startAutoSync(); showToast("Saved","ok");
-}
+function saveSettings(){SHEET_URL=document.getElementById("s_url").value.trim();closeModal();startAutoSync();showToast("Saved","ok");}
 
 tick(); setInterval(tick,1000); startAutoSync();
 </script>
