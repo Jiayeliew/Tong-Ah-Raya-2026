@@ -378,20 +378,20 @@
     <div class="stock-submitted-banner" id="stockSubmittedBanner" style="display:none">
       ✅ Stock count submitted today. You can submit again to overwrite with corrected data.
     </div>
-    <div style="overflow-x:auto;position:relative;">
+    <div style="overflow-x:auto;overflow-y:auto;max-height:calc(100vh - 200px);position:relative;">
     <table class="stock-table" style="min-width:900px;">
       <thead>
         <tr>
           <th>SKU</th>
           <th>Product</th>
           <th style="text-align:center">Open B/D</th>
-          <th style="text-align:center">+HQ</th>
-          <th style="text-align:center">+Transfer</th>
+          <th style="text-align:center;background:#f0faf4;color:var(--green)">+HQ</th>
+          <th style="text-align:center;background:#f0faf4;color:var(--green)">+Transfer</th>
           <th style="text-align:center;background:var(--surface)">Subtotal</th>
-          <th style="text-align:center">−Sales</th>
-          <th style="text-align:center">−Sample</th>
-          <th style="text-align:center">−Faulty</th>
-          <th style="text-align:center">−FOC</th>
+          <th style="text-align:center;background:#fff5f5;color:var(--red)">−Sales</th>
+          <th style="text-align:center;background:#fff5f5;color:var(--red)">−Sample</th>
+          <th style="text-align:center;background:#fff5f5;color:var(--red)">−Faulty</th>
+          <th style="text-align:center;background:#fff5f5;color:var(--red)">−FOC</th>
           <th style="text-align:center;background:var(--blue-bg);color:var(--blue)">Actual Qty</th>
           <th style="text-align:center;background:var(--gold-bg);color:var(--gold)">Closing C/D</th>
           <th style="min-width:120px">Remarks</th>
