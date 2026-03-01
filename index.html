@@ -742,14 +742,19 @@ function confirmUpdate(){
   var val=parseFloat(document.getElementById("umInput").value);
   if(isNaN(val)||val<0){showToast("Please enter a valid amount","err");return;}
 
-  // Update local display first so DOM shows latest values
-  if(lastData){lastData.daily_sales=val;renderDash(lastData);}
+  // Update local display — fix total_sales too so overallComm calculates correctly
+  if(lastData){
+    var _oldDaily = lastData.daily_sales || 0;
+    lastData.total_sales = (lastData.total_sales || 0) - _oldDaily + val;
+    lastData.daily_sales = val;
+    renderDash(lastData);
+  }
   closeUpdateModal(); showToast("Saving…","info");
 
-  // Read directly from what dashboard is already showing — single source of truth
-  var _overallComm = parseFloat(document.getElementById("overallComm").textContent.replace(/[^0-9.]/g,"")) || 0;
-  var _commAmt     = parseFloat(document.getElementById("commAmt").textContent.replace(/[^0-9.]/g,"")) || 0;
-  var _totalBonus  = parseFloat(document.getElementById("totalBonusAmt").textContent.replace(/[^0-9.]/g,"")) || 0;
+  // Read directly from DOM after render — single source of truth
+  var _overallComm = parseFloat(document.getElementById("overallComm").textContent.replace(/,/g,"")) || 0;
+  var _commAmt     = parseFloat(document.getElementById("commAmt").textContent.replace(/,/g,"")) || 0;
+  var _totalBonus  = parseFloat(document.getElementById("totalBonusAmt").textContent.replace(/,/g,"")) || 0;
 
   fetch(SHEET_URL,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify({action:"updateSales",daily_sales:val,overall_comm:_overallComm,today_bonus:_commAmt,total_bonus:_totalBonus})
