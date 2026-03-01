@@ -805,7 +805,12 @@ async function testConn(){
   box.innerHTML='<span class="warn">Testing…</span>';
   try{
     var d=await jsonpFetch(url);
-    box.innerHTML='<span class="ok">✓ Connected!</span><br>Daily: RM '+(d.daily_sales||0)+' | Today: '+(d.ok?"Found ✓":"Not found")+'<br>Employees: '+((d.employees||[]).join(", ")||"none");
+    box.innerHTML='<span class="'+(d.ok?"ok":"warn")+'">Row found: '+(d.ok?"YES ✓":"NO ✗")+'</span><br>'
+      +'Today (script): '+d.date+'<br>'
+      +'daily_sales (B): <b>RM '+(d.daily_sales||0)+'</b><br>'
+      +'total_sales (C): <b>RM '+(d.total_sales||0)+'</b><br>'
+      +'Employees: '+((d.employees||[]).join(", ")||"none")+'<br>'
+      +'<span style="color:#888;font-size:10px">'+(d.debug||d.hint||"")+'</span>';
     setSyncUI("ok","LIVE"); renderDash(d); renderEmps(d.employees||[]);
   }catch(err){box.innerHTML='<span class="er">✗ '+err.message+'</span>';setSyncUI("err","ERROR");}
 }
