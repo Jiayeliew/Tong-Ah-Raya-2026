@@ -742,30 +742,27 @@ function confirmUpdate(){
   var val=parseFloat(document.getElementById("umInput").value);
   if(isNaN(val)||val<0){showToast("Please enter a valid amount","err");return;}
 
-  // Update local display — fix total_sales too so overallComm calculates correctly
+  // Update local display immediately
   if(lastData){
-    var _oldDaily = lastData.daily_sales || 0;
-    lastData.total_sales = (lastData.total_sales || 0) - _oldDaily + val;
+    var _old = lastData.daily_sales || 0;
+    lastData.total_sales = (lastData.total_sales || 0) - _old + val;
     lastData.daily_sales = val;
     renderDash(lastData);
   }
   closeUpdateModal(); showToast("Saving…","info");
 
-  // Read directly from DOM after render — single source of truth
-  var _overallComm = parseFloat(document.getElementById("overallComm").textContent.replace(/,/g,"")) || 0;
-  var _commAmt     = parseFloat(document.getElementById("commAmt").textContent.replace(/,/g,"")) || 0;
-  var _totalBonus  = parseFloat(document.getElementById("totalBonusAmt").textContent.replace(/,/g,"")) || 0;
-
+  // Code.gs calculates Total_Bonus and Overall_Comm from Sheets — just send daily_sales
   fetch(SHEET_URL,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},
-    body:JSON.stringify({action:"updateSales",daily_sales:val,overall_comm:_overallComm,today_bonus:_commAmt,total_bonus:_totalBonus})
+    body:JSON.stringify({action:"updateSales",daily_sales:val})
   }).then(function(resp){ return resp.json(); })
   .then(function(r){
     if(r.ok){
-      showToast("Saved ✓  Total:RM "+r.total+" Bonus:RM "+r.total_bonus+" Comm:RM "+r.overall_comm,"ok");
+      showToast("Saved ✓  Bonus: RM "+r.total_bonus+"  Comm: RM "+r.overall_comm,"ok");
     } else {
-      showToast("Script error: "+(r.error||"unknown"),"err");
+      showToast("Error: "+(r.error||"unknown"),"err");
     }
-    setTimeout(function(){ fetchSheets(true); }, 800);
+    // Re-fetch so dashboard reflects what was written to Sheets
+    setTimeout(function(){ fetchSheets(true); }, 1000);
   }).catch(function(e){showToast("POST failed: "+e.message,"err");});
 }
 document.addEventListener("DOMContentLoaded",function(){
