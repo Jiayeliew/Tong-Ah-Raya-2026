@@ -253,25 +253,30 @@
   ::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
   /* Quick Action buttons */
-  .qa-section{padding:12px 16px;border-top:1px solid var(--border);}
-  .qa-daily-row{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
-  .qa-daily-row>div:first-child{flex-shrink:0;}
-  .daily-tasks-wrap{flex:1;min-width:180px;}
-  .daily-task-list{display:flex;flex-direction:column;gap:5px;margin-top:4px;}
-  .daily-task-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;transition:all .12s;user-select:none;}
+  /* Actions col */
+  .actions-col{flex-shrink:0;min-width:140px;display:flex;flex-direction:column;padding:12px 14px;gap:7px;border-right:1px solid var(--border);}
+  .action-hint{font-size:11px;color:var(--muted);font-style:italic;font-family:'DM Sans',sans-serif;}
+  .action-btns{display:flex;flex-direction:column;gap:6px;}
+  .act-btn{height:34px;border-radius:8px;border:1.5px solid var(--border2);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;width:100%;}
+  .act-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .act-btn:not(:disabled):active{transform:scale(.96);}
+  .act-btn.clock:not(:disabled){border-color:var(--border2);color:var(--text);}
+  .act-btn.foc:not(:disabled){border-color:var(--blue-border);color:var(--blue);background:var(--blue-bg);}
+  .act-btn.sample:not(:disabled){border-color:var(--gold-border);color:var(--gold);background:var(--gold-bg);}
+  .act-btn.faulty:not(:disabled){border-color:var(--red-border);color:var(--red);background:var(--red-bg);}
+  /* Daily tasks col */
+  .tasks-col{flex-shrink:0;min-width:160px;max-width:220px;display:flex;flex-direction:column;padding:12px 14px;gap:7px;border-right:1px solid var(--border);}
+  .daily-task-list{display:grid;grid-template-columns:1fr;gap:4px;margin-top:2px;}
+  .daily-task-item{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;transition:all .12s;user-select:none;}
   .daily-task-item:hover{border-color:var(--border2);background:var(--surface);}
   .daily-task-item.done{background:var(--green-bg);border-color:var(--green-border);}
-  .daily-task-item.done .task-text{color:var(--green);text-decoration:line-through;}
-  .task-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border2);background:var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .12s;}
+  .daily-task-item.done .task-text{color:var(--green);text-decoration:line-through;opacity:.7;}
+  .task-check{width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .12s;}
   .daily-task-item.done .task-check{background:var(--green);border-color:var(--green);color:#fff;}
-  .task-text{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);}
+  .task-text{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);line-height:1.3;}
   .qa-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
   .qa-row{display:flex;gap:8px;}
-  .qa-btn{flex:1;height:36px;border-radius:8px;border:1.5px solid var(--border2);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;gap:4px;}
-  .qa-btn:active{transform:scale(.96);}
-  .qa-btn.foc{border-color:var(--blue-border);color:var(--blue);background:var(--blue-bg);}
-  .qa-btn.sample{border-color:var(--gold-border);color:var(--gold);background:var(--gold-bg);}
-  .qa-btn.faulty{border-color:var(--red-border);color:var(--red);background:var(--red-bg);}
+
   /* Action modal */
   .action-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
   .action-modal-bg.open{display:flex;}
@@ -326,6 +331,8 @@
     .panel-daily{border-right:none;border-bottom:1px solid var(--border);}
     .big-num .amt{font-size:48px;}
     .cam-wrap{width:100%!important;border-right:none;border-bottom:1px solid var(--border);}
+    .tasks-col{min-width:0;max-width:none;flex:1;}
+    .daily-task-list{grid-template-columns:1fr 1fr;}
     .tier-right{width:auto;}
     /* SKU column visible on all screens */
   }
@@ -403,35 +410,39 @@
       </div>
     </div>
   </div>
-  <!-- Quick Actions + Daily Tasks -->
-  <div class="qa-section">
-    <div class="qa-daily-row">
-      <div>
-        <div class="qa-label">QUICK ACTION</div>
-        <div class="qa-row">
-          <button class="qa-btn foc" onclick="openActionModal('FOC')">📦 FOC</button>
-          <button class="qa-btn sample" onclick="openActionModal('Sample')">🧪 Sample</button>
-          <button class="qa-btn faulty" onclick="openActionModal('Faulty')">⚠️ Faulty</button>
-        </div>
-      </div>
-      <div class="daily-tasks-wrap">
-        <div class="qa-label">DAILY TASKS</div>
-        <div id="dailyTaskList" class="daily-task-list"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Clock zone -->
+  <!-- Staff + Actions + Tasks zone -->
   <div class="clock-zone">
+
+    <!-- Staff selection -->
     <div class="emp-section">
-      <div class="zone-label">CLOCK IN / OUT</div>
+      <div class="zone-label">STAFF</div>
       <div class="emp-grid" id="empGrid"><div style="font-size:12px;color:var(--muted)">Loading…</div></div>
     </div>
 
+    <!-- Actions column -->
+    <div class="actions-col">
+      <div class="zone-label">ACTIONS</div>
+      <div class="action-hint" id="actionHint">Select a staff member first</div>
+      <div class="action-btns" id="actionBtns">
+        <button class="act-btn clock" onclick="triggerAction('clock')" disabled id="actClock">🕐 Clock In / Out</button>
+        <button class="act-btn foc"   onclick="triggerAction('FOC')"   disabled id="actFOC">📦 FOC</button>
+        <button class="act-btn sample" onclick="triggerAction('Sample')" disabled id="actSample">🧪 Sample</button>
+        <button class="act-btn faulty" onclick="triggerAction('Faulty')" disabled id="actFaulty">⚠️ Faulty</button>
+      </div>
+    </div>
+
+    <!-- Daily Tasks -->
+    <div class="tasks-col">
+      <div class="zone-label">DAILY TASKS</div>
+      <div id="dailyTaskList" class="daily-task-list"></div>
+    </div>
+
+    <!-- Recent feed -->
     <div class="feed-section">
       <div class="zone-label">Recent</div>
       <div class="feed-scroll" id="feedScroll"></div>
     </div>
+
     <div class="settings-col"><button class="settings-btn" onclick="openModal()">⚙ SETUP</button></div>
   </div>
 </div>
@@ -687,20 +698,50 @@ function renderDash(d){
   document.getElementById("overallPctRow").textContent=ts?tierLabel+" × RM "+ts.toLocaleString():"—";
 }
 
+var selectedStaff = null;
+
 function renderEmps(emps){
   var g=document.getElementById("empGrid"); g.innerHTML="";
   var sel=document.getElementById("stockEmpSelect");
-  // Keep first option
   while(sel.options.length>1) sel.remove(1);
   if(!emps||!emps.length){g.innerHTML="<div style=\"font-size:12px;color:var(--muted)\">No employees</div>";return;}
   for(var i=0;i<emps.length;i++){
     (function(name){
       var b=document.createElement("button"); b.className="emp-btn"; b.textContent=name;
-      b.onclick=function(){openPunchModal(name);};
+      b.onclick=function(){
+        // Toggle: click same name deselects
+        if(selectedStaff===name){
+          selectedStaff=null;
+          b.classList.remove("sel");
+        } else {
+          selectedStaff=name;
+          document.querySelectorAll(".emp-btn").forEach(function(x){x.classList.remove("sel");});
+          b.classList.add("sel");
+        }
+        updateActionBtns();
+      };
       g.appendChild(b);
       var opt=document.createElement("option"); opt.value=name; opt.textContent=name;
       sel.appendChild(opt);
     })(emps[i]);
+  }
+}
+
+function updateActionBtns(){
+  var has=!!selectedStaff;
+  var hint=document.getElementById("actionHint");
+  if(hint) hint.style.display=has?"none":"block";
+  ["actClock","actFOC","actSample","actFaulty"].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.disabled=!has;
+  });
+}
+
+function triggerAction(type){
+  if(!selectedStaff){showToast("Select a staff member first","err");return;}
+  if(type==="clock"){
+    openPunchModal(selectedStaff);
+  } else {
+    openActionModal(type, selectedStaff);
   }
 }
 
@@ -966,7 +1007,7 @@ document.addEventListener("DOMContentLoaded",function(){
 var actionType = null, actionCamStream = null;
 var actionProducts = []; // populated from lastData
 
-function openActionModal(type){
+function openActionModal(type, prefilledStaff){
   actionType = type;
   var typeClass = type.toLowerCase();
   document.getElementById("actionModalTitle").textContent = type;
@@ -974,15 +1015,20 @@ function openActionModal(type){
   typeEl.textContent = type.toUpperCase();
   typeEl.className = "action-modal-type " + typeClass;
 
-  // Populate employee dropdown
+  // Populate employee dropdown, pre-select if staff passed in
   var empSel = document.getElementById("actionEmp");
   empSel.innerHTML = '<option value="">Select Employee</option>';
+  var staffToSelect = prefilledStaff || selectedStaff || null;
   if(lastData && lastData.employees){
     lastData.employees.forEach(function(e){
       var o=document.createElement("option"); o.value=e; o.textContent=e;
+      if(e===staffToSelect) o.selected=true;
       empSel.appendChild(o);
     });
   }
+  // Hide employee row if staff pre-filled
+  var empField = empSel.closest(".action-field");
+  if(empField) empField.style.display = staffToSelect ? "none" : "flex";
 
   // Populate product dropdown
   var skuSel = document.getElementById("actionSku");
@@ -1024,6 +1070,10 @@ function openActionModal(type){
 function closeActionModal(){
   document.getElementById("actionModalBg").classList.remove("open");
   stopActionCam(); actionType = null;
+  // Deselect staff after action
+  selectedStaff = null;
+  document.querySelectorAll(".emp-btn").forEach(function(b){b.classList.remove("sel");});
+  updateActionBtns();
 }
 
 function startActionCam(){
@@ -1121,6 +1171,10 @@ function closePunchModal(){
   document.getElementById("punchModalBg").classList.remove("open");
   stopPunchCam();
   punchEmp = null; punchType = null;
+  // Deselect staff after action
+  selectedStaff = null;
+  document.querySelectorAll(".emp-btn").forEach(function(b){b.classList.remove("sel");});
+  updateActionBtns();
 }
 function punchSelect(type){
   punchType = type;
@@ -1240,7 +1294,7 @@ async function testConn(){
 }
 function saveSettings(){SHEET_URL=document.getElementById("s_url").value.trim();closeModal();startAutoSync();showToast("Saved","ok");}
 
-tick(); setInterval(tick,1000); startAutoSync(); renderDailyTasks();
+tick(); setInterval(tick,1000); startAutoSync(); renderDailyTasks(); updateActionBtns();
 </script>
 </body>
 </html>
