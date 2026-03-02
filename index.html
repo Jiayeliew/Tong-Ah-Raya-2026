@@ -254,9 +254,20 @@
 
   /* Quick Action buttons */
   .qa-section{padding:12px 16px;border-top:1px solid var(--border);}
+  .qa-daily-row{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+  .qa-daily-row>div:first-child{flex-shrink:0;}
+  .daily-tasks-wrap{flex:1;min-width:180px;}
+  .daily-task-list{display:flex;flex-direction:column;gap:5px;margin-top:4px;}
+  .daily-task-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;transition:all .12s;user-select:none;}
+  .daily-task-item:hover{border-color:var(--border2);background:var(--surface);}
+  .daily-task-item.done{background:var(--green-bg);border-color:var(--green-border);}
+  .daily-task-item.done .task-text{color:var(--green);text-decoration:line-through;}
+  .task-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border2);background:var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .12s;}
+  .daily-task-item.done .task-check{background:var(--green);border-color:var(--green);color:#fff;}
+  .task-text{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);}
   .qa-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
   .qa-row{display:flex;gap:8px;}
-  .qa-btn{flex:1;height:44px;border-radius:10px;border:1.5px solid var(--border2);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;gap:5px;}
+  .qa-btn{flex:1;height:36px;border-radius:8px;border:1.5px solid var(--border2);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;gap:4px;}
   .qa-btn:active{transform:scale(.96);}
   .qa-btn.foc{border-color:var(--blue-border);color:var(--blue);background:var(--blue-bg);}
   .qa-btn.sample{border-color:var(--gold-border);color:var(--gold);background:var(--gold-bg);}
@@ -392,26 +403,28 @@
       </div>
     </div>
   </div>
-  <!-- Quick Actions -->
+  <!-- Quick Actions + Daily Tasks -->
   <div class="qa-section">
-    <div class="qa-label">QUICK ACTION</div>
-    <div class="qa-row">
-      <button class="qa-btn foc" onclick="openActionModal('FOC')">📦 FOC</button>
-      <button class="qa-btn sample" onclick="openActionModal('Sample')">🧪 Sample</button>
-      <button class="qa-btn faulty" onclick="openActionModal('Faulty')">⚠️ Faulty</button>
+    <div class="qa-daily-row">
+      <div>
+        <div class="qa-label">QUICK ACTION</div>
+        <div class="qa-row">
+          <button class="qa-btn foc" onclick="openActionModal('FOC')">📦 FOC</button>
+          <button class="qa-btn sample" onclick="openActionModal('Sample')">🧪 Sample</button>
+          <button class="qa-btn faulty" onclick="openActionModal('Faulty')">⚠️ Faulty</button>
+        </div>
+      </div>
+      <div class="daily-tasks-wrap">
+        <div class="qa-label">DAILY TASKS</div>
+        <div id="dailyTaskList" class="daily-task-list"></div>
+      </div>
     </div>
   </div>
 
   <!-- Clock zone -->
   <div class="clock-zone">
-    <div class="cam-wrap" style="min-height:160px;">
-      <video id="video" autoplay playsinline muted></video>
-      <canvas id="canvas"></canvas>
-      <div class="cam-idle" id="camIdle"><div class="cam-idle-icon">📷</div><div class="cam-idle-text">SELECT EMPLOYEE</div></div>
-      <div class="cam-rec" id="camRec"></div>
-    </div>
     <div class="emp-section">
-      <div class="zone-label">Select Employee</div>
+      <div class="zone-label">CLOCK IN / OUT</div>
       <div class="emp-grid" id="empGrid"><div style="font-size:12px;color:var(--muted)">Loading…</div></div>
     </div>
 
@@ -450,17 +463,15 @@
           <th style="text-align:center">Open B/D</th>
           <th style="text-align:center;background:#f0faf4;color:var(--green)">+HQ</th>
           <th style="text-align:center;background:#f0faf4;color:var(--green)">+Transfer</th>
-          <th style="text-align:center;background:var(--surface)">Subtotal</th>
           <th style="text-align:center;background:#fff5f5;color:var(--red)">−Sales</th>
           <th style="text-align:center;background:#fff5f5;color:var(--red)">−Action</th>
-          <th style="text-align:center;background:var(--blue-bg);color:var(--blue)">Expected Qty</th>
-          <th style="text-align:center;background:var(--gold-bg);color:var(--gold)">Closing C/D</th>
+          <th style="text-align:center;background:var(--blue-bg);color:var(--blue)">Expected</th>
+          <th style="text-align:center;background:var(--gold-bg);color:var(--gold)">Closing</th>
           <th style="min-width:130px">Remarks</th>
-          <th style="text-align:center">PAR</th>
         </tr>
       </thead>
       <tbody id="stockTableBody">
-        <tr><td colspan="12" style="text-align:center;padding:30px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;">Loading products…</td></tr>
+        <tr><td colspan="10" style="text-align:center;padding:30px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;">Loading products…</td></tr>
       </tbody>
     </table>
     </div>
@@ -715,7 +726,7 @@ var stockProducts=[];
 
 async function loadStockTab(){
   var tbody=document.getElementById("stockTableBody");
-  tbody.innerHTML='<tr><td colspan="12" style="text-align:center;padding:30px;color:var(--muted);font-family:DM Mono,monospace;font-size:12px;">Loading…</td></tr>';
+  tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--muted);font-family:DM Mono,monospace;font-size:12px;">Loading…</td></tr>';
   try{
     var d=await jsonpFetch(SHEET_URL+"?action=stock");
     stockData=d; stockProducts=d.products||[];
@@ -723,7 +734,7 @@ async function loadStockTab(){
     document.getElementById("stockSubmittedBanner").style.display=d.submitted?"block":"none";
     renderStockTable(stockProducts);
   }catch(err){
-    tbody.innerHTML='<tr><td colspan="12" style="text-align:center;padding:30px;color:var(--red);font-size:12px;">Failed to load: '+err.message+'</td></tr>';
+    tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--red);font-size:12px;">Failed to load: '+err.message+'</td></tr>';
   }
 }
 
@@ -745,13 +756,11 @@ function renderStockTable(products){
       +'<td style="text-align:center;font-family:DM Mono,monospace;font-size:13px;color:var(--blue);font-weight:600">'+p.opening_bd+'</td>'
       +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="0" value="'+hq+'" data-idx="'+i+'" data-field="stock_in_hq" oninput="onStockInput(this)"></td>'
       +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="0" value="'+tf+'" data-idx="'+i+'" data-field="stock_in_transfer" oninput="onStockInput(this)"></td>'
-      +'<td style="text-align:center;background:var(--surface);font-family:DM Mono,monospace;font-weight:600;font-size:13px" id="subtotal-'+i+'">—</td>'
       +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="0" value="'+sl+'" data-idx="'+i+'" data-field="sales" oninput="onStockInput(this)"></td>'
       +'<td style="text-align:center;background:#fff5f5;font-family:DM Mono,monospace;font-weight:600;font-size:13px;color:var(--red)" id="action-'+i+'">'+(p.action_total||0)+'</td>'
       +'<td style="text-align:center;background:var(--blue-bg);font-family:DM Mono,monospace;font-weight:700;color:var(--blue);font-size:14px" id="expected-'+i+'">—</td>'
       +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="—" value="'+cl+'" data-idx="'+i+'" data-field="closing_cd" id="closing-'+i+'" oninput="onClosingInput(this)" style="background:var(--gold-bg);border-color:var(--gold-border);width:72px"></td>'
-      +'<td><input type="text" placeholder="Required if closing ≠ expected" value="'+rm+'" data-idx="'+i+'" id="remarks-'+i+'" oninput="stockProducts[parseInt(this.dataset.idx)].remarks=this.value;checkRemarks(parseInt(this.dataset.idx))" style="width:100%;min-width:120px;font-size:12px;padding:6px 8px;border:1.5px solid var(--border2);border-radius:6px;outline:none"></td>'
-      +'<td style="text-align:center"><span class="par-badge">'+p.par+'</span></td>';
+      +'<td><input type="text" placeholder="Remarks if closing ≠ expected" value="'+rm+'" data-idx="'+i+'" id="remarks-'+i+'" oninput="stockProducts[parseInt(this.dataset.idx)].remarks=this.value;checkRemarks(parseInt(this.dataset.idx))" style="width:100%;min-width:120px;font-size:12px;padding:6px 8px;border:1.5px solid var(--border2);border-radius:6px;outline:none"></td>';
     tbody.appendChild(tr);
     recalcRow(i);
   }
@@ -773,8 +782,6 @@ function recalcRow(idx){
   var action=p.action_total||0;  // from ACTIONS tab, read-only
   var expected=subtotal-sales-action;
 
-  var stEl=document.getElementById("subtotal-"+idx);
-  if(stEl) stEl.textContent=subtotal;
   var exEl=document.getElementById("expected-"+idx);
   if(exEl){ exEl.textContent=expected; exEl.style.color=expected<0?"var(--red)":"var(--blue)"; }
 
@@ -1184,6 +1191,35 @@ function showToast(msg,type){
   setTimeout(function(){t.classList.remove("show");},2500);
 }
 
+// ── Daily Tasks ────────────────────────────────────────────
+var DAILY_TASKS = [
+  "Open store & display setup",
+  "Check product expiry dates",
+  "Restock display from storage",
+  "Clean display area",
+  "Evening stock count"
+];
+var tasksDone = {};
+var lastTaskDate = new Date().toDateString();
+
+function renderDailyTasks(){
+  var list = document.getElementById("dailyTaskList");
+  if(!list) return;
+  list.innerHTML = "";
+  DAILY_TASKS.forEach(function(task, i){
+    var done = !!tasksDone[i];
+    var div = document.createElement("div");
+    div.className = "daily-task-item" + (done ? " done" : "");
+    div.innerHTML = '<div class="task-check">'+(done?"✓":"")+'</div><span class="task-text">'+task+'</span>';
+    div.onclick = function(){ tasksDone[i]=!tasksDone[i]; renderDailyTasks(); };
+    list.appendChild(div);
+  });
+}
+setInterval(function(){
+  var today=new Date().toDateString();
+  if(today!==lastTaskDate){ tasksDone={}; lastTaskDate=today; renderDailyTasks(); }
+},60000);
+
 // ── Setup modal ────────────────────────────────────────────
 function openModal(){document.getElementById("s_url").value=SHEET_URL;document.getElementById("modalBg").classList.add("open");}
 function closeModal(){document.getElementById("modalBg").classList.remove("open");}
@@ -1204,7 +1240,7 @@ async function testConn(){
 }
 function saveSettings(){SHEET_URL=document.getElementById("s_url").value.trim();closeModal();startAutoSync();showToast("Saved","ok");}
 
-tick(); setInterval(tick,1000); startAutoSync();
+tick(); setInterval(tick,1000); startAutoSync(); renderDailyTasks();
 </script>
 </body>
 </html>
