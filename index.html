@@ -252,6 +252,41 @@
   .btn-cancel{background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;color:var(--muted);}
   ::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
+  /* Quick Action buttons */
+  .qa-section{padding:12px 16px;border-top:1px solid var(--border);}
+  .qa-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
+  .qa-row{display:flex;gap:8px;}
+  .qa-btn{flex:1;height:44px;border-radius:10px;border:1.5px solid var(--border2);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;gap:5px;}
+  .qa-btn:active{transform:scale(.96);}
+  .qa-btn.foc{border-color:var(--blue-border);color:var(--blue);background:var(--blue-bg);}
+  .qa-btn.sample{border-color:var(--gold-border);color:var(--gold);background:var(--gold-bg);}
+  .qa-btn.faulty{border-color:var(--red-border);color:var(--red);background:var(--red-bg);}
+  /* Action modal */
+  .action-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+  .action-modal-bg.open{display:flex;}
+  .action-modal{background:var(--bg);border:1px solid var(--border2);border-radius:18px;padding:24px;width:min(360px,92vw);display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 80px rgba(0,0,0,.2);position:relative;}
+  .action-modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);padding:4px 6px;border-radius:6px;}
+  .action-modal-close:hover{background:var(--surface2);color:var(--text);}
+  .action-modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+  .action-modal-type{display:inline-block;padding:3px 10px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;}
+  .action-modal-type.foc{background:var(--blue-bg);color:var(--blue);}
+  .action-modal-type.sample{background:var(--gold-bg);color:var(--gold);}
+  .action-modal-type.faulty{background:var(--red-bg);color:var(--red);}
+  .action-field{display:flex;flex-direction:column;gap:5px;}
+  .action-field label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--muted);}
+  .action-field select,.action-field input[type=number],.action-field input[type=text],.action-field textarea{
+    width:100%;padding:10px 12px;border:1.5px solid var(--border2);border-radius:9px;
+    font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);}
+  .action-field select:focus,.action-field input:focus,.action-field textarea:focus{border-color:var(--gold);}
+  .action-field textarea{resize:none;height:68px;font-size:13px;}
+  .action-cam-wrap{width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--surface2);position:relative;display:flex;align-items:center;justify-content:center;}
+  .action-cam-wrap video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
+  .action-cam-placeholder{font-size:24px;opacity:.2;}
+  .action-cam-rec{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);display:none;animation:blink .8s infinite;}
+  .action-submit-btn{width:100%;height:48px;background:var(--gold);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;transition:all .12s;}
+  .action-submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .action-submit-btn:not(:disabled):active{transform:scale(.97);}
+
   /* Punch modal */
   .punch-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
   .punch-modal-bg.open{display:flex;}
@@ -357,6 +392,16 @@
       </div>
     </div>
   </div>
+  <!-- Quick Actions -->
+  <div class="qa-section">
+    <div class="qa-label">QUICK ACTION</div>
+    <div class="qa-row">
+      <button class="qa-btn foc" onclick="openActionModal('FOC')">📦 FOC</button>
+      <button class="qa-btn sample" onclick="openActionModal('Sample')">🧪 Sample</button>
+      <button class="qa-btn faulty" onclick="openActionModal('Faulty')">⚠️ Faulty</button>
+    </div>
+  </div>
+
   <!-- Clock zone -->
   <div class="clock-zone">
     <div class="cam-wrap" style="min-height:160px;">
@@ -407,17 +452,15 @@
           <th style="text-align:center;background:#f0faf4;color:var(--green)">+Transfer</th>
           <th style="text-align:center;background:var(--surface)">Subtotal</th>
           <th style="text-align:center;background:#fff5f5;color:var(--red)">−Sales</th>
-          <th style="text-align:center;background:#fff5f5;color:var(--red)">−Sample</th>
-          <th style="text-align:center;background:#fff5f5;color:var(--red)">−Faulty</th>
-          <th style="text-align:center;background:#fff5f5;color:var(--red)">−FOC</th>
-          <th style="text-align:center;background:var(--blue-bg);color:var(--blue)">Actual Qty</th>
+          <th style="text-align:center;background:#fff5f5;color:var(--red)">−Action</th>
+          <th style="text-align:center;background:var(--blue-bg);color:var(--blue)">Expected Qty</th>
           <th style="text-align:center;background:var(--gold-bg);color:var(--gold)">Closing C/D</th>
-          <th style="min-width:120px">Remarks</th>
+          <th style="min-width:130px">Remarks</th>
           <th style="text-align:center">PAR</th>
         </tr>
       </thead>
       <tbody id="stockTableBody">
-        <tr><td colspan="14" style="text-align:center;padding:30px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;">Loading products…</td></tr>
+        <tr><td colspan="12" style="text-align:center;padding:30px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;">Loading products…</td></tr>
       </tbody>
     </table>
     </div>
@@ -442,6 +485,40 @@
         <button class="submit-stock-btn" onclick="switchTab('stock',this)" style="background:var(--blue)">Go to Stock Count →</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Quick Action Modal -->
+<div class="action-modal-bg" id="actionModalBg">
+  <div class="action-modal">
+    <button class="action-modal-close" onclick="closeActionModal()">✕</button>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="action-modal-title" id="actionModalTitle">FOC</div>
+      <div class="action-modal-type" id="actionModalType">FOC</div>
+    </div>
+    <div class="action-field">
+      <label>EMPLOYEE</label>
+      <select id="actionEmp"><option value="">Select Employee</option></select>
+    </div>
+    <div class="action-field">
+      <label>PRODUCT</label>
+      <select id="actionSku"><option value="">Select Product</option></select>
+    </div>
+    <div class="action-field">
+      <label>QUANTITY</label>
+      <input type="number" id="actionQty" min="1" value="1" placeholder="1">
+    </div>
+    <div class="action-field" id="actionRemarksField">
+      <label id="actionRemarksLabel">REMARKS <span style="color:var(--red)">*</span></label>
+      <textarea id="actionRemarks" placeholder="Required"></textarea>
+    </div>
+    <!-- Camera for Faulty (ceremonial) -->
+    <div class="action-cam-wrap" id="actionCamWrap" style="display:none">
+      <video id="actionVideo" autoplay playsinline muted></video>
+      <div class="action-cam-placeholder" id="actionCamPlaceholder">📷</div>
+      <div class="action-cam-rec" id="actionCamRec"></div>
+    </div>
+    <button class="action-submit-btn" id="actionSubmitBtn" onclick="submitAction()">Submit</button>
   </div>
 </div>
 
@@ -638,7 +715,7 @@ var stockProducts=[];
 
 async function loadStockTab(){
   var tbody=document.getElementById("stockTableBody");
-  tbody.innerHTML='<tr><td colspan="14" style="text-align:center;padding:30px;color:var(--muted);font-family:DM Mono,monospace;font-size:12px;">Loading…</td></tr>';
+  tbody.innerHTML='<tr><td colspan="12" style="text-align:center;padding:30px;color:var(--muted);font-family:DM Mono,monospace;font-size:12px;">Loading…</td></tr>';
   try{
     var d=await jsonpFetch(SHEET_URL+"?action=stock");
     stockData=d; stockProducts=d.products||[];
@@ -646,7 +723,7 @@ async function loadStockTab(){
     document.getElementById("stockSubmittedBanner").style.display=d.submitted?"block":"none";
     renderStockTable(stockProducts);
   }catch(err){
-    tbody.innerHTML='<tr><td colspan="14" style="text-align:center;padding:30px;color:var(--red);font-size:12px;">Failed to load: '+err.message+'</td></tr>';
+    tbody.innerHTML='<tr><td colspan="12" style="text-align:center;padding:30px;color:var(--red);font-size:12px;">Failed to load: '+err.message+'</td></tr>';
   }
 }
 
@@ -660,9 +737,6 @@ function renderStockTable(products){
     var hq=p.stock_in_hq!==null?p.stock_in_hq:"";
     var tf=p.stock_in_transfer!==null?p.stock_in_transfer:"";
     var sl=p.sales!==null?p.sales:"";
-    var sm=p.sample!==null?p.sample:"";
-    var fa=p.faulty!==null?p.faulty:"";
-    var fo=p.foc!==null?p.foc:"";
     var cl=p.closing_cd!==null?p.closing_cd:"";
     var rm=p.remarks||"";
     tr.innerHTML=
@@ -673,12 +747,10 @@ function renderStockTable(products){
       +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="0" value="'+tf+'" data-idx="'+i+'" data-field="stock_in_transfer" oninput="onStockInput(this)"></td>'
       +'<td style="text-align:center;background:var(--surface);font-family:DM Mono,monospace;font-weight:600;font-size:13px" id="subtotal-'+i+'">—</td>'
       +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="0" value="'+sl+'" data-idx="'+i+'" data-field="sales" oninput="onStockInput(this)"></td>'
-      +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="0" value="'+sm+'" data-idx="'+i+'" data-field="sample" oninput="onStockInput(this)"></td>'
-      +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="0" value="'+fa+'" data-idx="'+i+'" data-field="faulty" oninput="onStockInput(this)"></td>'
-      +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="0" value="'+fo+'" data-idx="'+i+'" data-field="foc" oninput="onStockInput(this)"></td>'
-      +'<td style="text-align:center;background:var(--blue-bg);font-family:DM Mono,monospace;font-weight:700;color:var(--blue);font-size:14px" id="actual-'+i+'">—</td>'
+      +'<td style="text-align:center;background:#fff5f5;font-family:DM Mono,monospace;font-weight:600;font-size:13px;color:var(--red)" id="action-'+i+'">'+(p.action_total||0)+'</td>'
+      +'<td style="text-align:center;background:var(--blue-bg);font-family:DM Mono,monospace;font-weight:700;color:var(--blue);font-size:14px" id="expected-'+i+'">—</td>'
       +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="—" value="'+cl+'" data-idx="'+i+'" data-field="closing_cd" id="closing-'+i+'" oninput="onClosingInput(this)" style="background:var(--gold-bg);border-color:var(--gold-border);width:72px"></td>'
-      +'<td><input type="text" placeholder="Required if closing ≠ actual" value="'+rm+'" data-idx="'+i+'" id="remarks-'+i+'" oninput="stockProducts[parseInt(this.dataset.idx)].remarks=this.value;checkRemarks(parseInt(this.dataset.idx))" style="width:100%;min-width:110px;font-size:12px;padding:6px 8px;border:1.5px solid var(--border2);border-radius:6px;outline:none;display:none"></td>'
+      +'<td><input type="text" placeholder="Required if closing ≠ expected" value="'+rm+'" data-idx="'+i+'" id="remarks-'+i+'" oninput="stockProducts[parseInt(this.dataset.idx)].remarks=this.value;checkRemarks(parseInt(this.dataset.idx))" style="width:100%;min-width:120px;font-size:12px;padding:6px 8px;border:1.5px solid var(--border2);border-radius:6px;outline:none"></td>'
       +'<td style="text-align:center"><span class="par-badge">'+p.par+'</span></td>';
     tbody.appendChild(tr);
     recalcRow(i);
@@ -697,22 +769,22 @@ function recalcRow(idx){
   var opening=p.opening_bd||0;
   var hq=getFieldVal(idx,"stock_in_hq"), tf=getFieldVal(idx,"stock_in_transfer");
   var subtotal=opening+hq+tf;
-  var sales=getFieldVal(idx,"sales"), sample=getFieldVal(idx,"sample");
-  var faulty=getFieldVal(idx,"faulty"), foc=getFieldVal(idx,"foc");
-  var actual=subtotal-sales-sample-faulty-foc;
+  var sales=getFieldVal(idx,"sales");
+  var action=p.action_total||0;  // from ACTIONS tab, read-only
+  var expected=subtotal-sales-action;
 
   var stEl=document.getElementById("subtotal-"+idx);
   if(stEl) stEl.textContent=subtotal;
-  var acEl=document.getElementById("actual-"+idx);
-  if(acEl){ acEl.textContent=actual; acEl.style.color=actual<0?"var(--red)":"var(--blue)"; }
+  var exEl=document.getElementById("expected-"+idx);
+  if(exEl){ exEl.textContent=expected; exEl.style.color=expected<0?"var(--red)":"var(--blue)"; }
 
   p.stock_in_hq=hq; p.stock_in_transfer=tf;
-  p.sales=sales; p.sample=sample; p.faulty=faulty; p.foc=foc;
+  p.sales=sales;
 
-  // Auto-set closing to actual unless user has overridden
+  // Auto-set closing to expected unless user has overridden
   var closingEl=document.getElementById("closing-"+idx);
   if(closingEl && !p.closing_overridden){
-    closingEl.value=actual; p.closing_cd=actual;
+    closingEl.value=expected; p.closing_cd=expected;
   }
   checkRemarks(idx);
   updateStockProgress();
@@ -723,9 +795,9 @@ function onStockInput(input){ recalcRow(parseInt(input.dataset.idx)); }
 function onClosingInput(input){
   var idx=parseInt(input.dataset.idx), p=stockProducts[idx];
   p.closing_cd=input.value===""?null:parseFloat(input.value)||0;
-  var acEl=document.getElementById("actual-"+idx);
-  var actual=acEl?parseFloat(acEl.textContent)||0:0;
-  p.closing_overridden=(p.closing_cd!==null && p.closing_cd!==actual);
+  var exEl=document.getElementById("expected-"+idx);
+  var expected=exEl?parseFloat(exEl.textContent)||0:0;
+  p.closing_overridden=(p.closing_cd!==null && p.closing_cd!==expected);
   input.style.borderColor=p.closing_overridden?"var(--amber)":"var(--gold-border)";
   input.style.background=p.closing_overridden?"var(--amber-bg)":"var(--gold-bg)";
   checkRemarks(idx);
@@ -733,11 +805,11 @@ function onClosingInput(input){
 
 function checkRemarks(idx){
   var p=stockProducts[idx];
-  var acEl=document.getElementById("actual-"+idx);
-  var actual=acEl?parseFloat(acEl.textContent)||0:0;
+  var exEl=document.getElementById("expected-"+idx);
+  var expected=exEl?parseFloat(exEl.textContent)||0:0;
   var rmEl=document.getElementById("remarks-"+idx); if(!rmEl) return;
-  var needRmk=(p.closing_cd!==null && p.closing_cd!==actual);
-  rmEl.style.display=needRmk?"block":"none";
+  var needRmk=(p.closing_cd!==null && p.closing_cd!==expected);
+  // Remarks always visible, highlight red border when required but empty
   rmEl.style.borderColor=(needRmk&&!rmEl.value.trim())?"var(--red)":"var(--border2)";
 }
 
@@ -750,18 +822,18 @@ function updateStockProgress(){
 async function submitStock(){
   var emp=document.getElementById("stockEmpSelect").value;
   if(!emp){showToast("Please select employee","err");return;}
-  // Validate remarks where closing ≠ actual
+  // Validate remarks where closing ≠ expected
   for(var v=0;v<stockProducts.length;v++){
     var pv=stockProducts[v];
-    var acEl=document.getElementById("actual-"+v);
-    if(!acEl) continue;
-    var actual=parseFloat(acEl.textContent)||0;
-    if(pv.closing_cd!==null && pv.closing_cd!==actual && !(pv.remarks&&pv.remarks.trim())){
+    var exEl=document.getElementById("expected-"+v);
+    if(!exEl) continue;
+    var expected=parseFloat(exEl.textContent)||0;
+    if(pv.closing_cd!==null && pv.closing_cd!==expected && !(pv.remarks&&pv.remarks.trim())){
       showToast("Remarks required for: "+pv.name,"err");
       document.getElementById("remarks-"+v).focus(); return;
     }
   }
-  var toSubmit=stockProducts.filter(function(p){return p.sales!==null||p.stock_in_hq||p.stock_in_transfer||p.sample||p.faulty||p.foc;});
+  var toSubmit=stockProducts.filter(function(p){return p.sales!==null||p.stock_in_hq||p.stock_in_transfer;});
   if(!toSubmit.length){showToast("Nothing to submit","err");return;}
   var btn=document.getElementById("submitStockBtn");
   btn.disabled=true; btn.textContent="Saving…";
@@ -772,13 +844,12 @@ async function submitStock(){
       body:JSON.stringify({
         action:"submitStock",employee:emp,store:"Raya 2026",
         items:toSubmit.map(function(p){
-          var acEl=document.getElementById("actual-"+stockProducts.indexOf(p));
-          var actualVal=acEl?parseFloat(acEl.textContent)||0:0;
+          var exEl2=document.getElementById("expected-"+stockProducts.indexOf(p));
+          var expectedVal=exEl2?parseFloat(exEl2.textContent)||0:0;
           return {sku:p.sku,name:p.name,par:p.par,
             opening_bd:p.opening_bd||0,stock_in_hq:p.stock_in_hq||0,
             stock_in_transfer:p.stock_in_transfer||0,sales:p.sales||0,
-            sample:p.sample||0,faulty:p.faulty||0,foc:p.foc||0,
-            closing_cd:p.closing_cd!==null?p.closing_cd:actualVal,
+            closing_cd:p.closing_cd!==null?p.closing_cd:expectedVal,
             remarks:p.remarks||""};
         })
       })
@@ -884,6 +955,150 @@ document.addEventListener("DOMContentLoaded",function(){
 });
 
 // ── Camera ─────────────────────────────────────────────────
+// ── Quick Action Modal ─────────────────────────────────────
+var actionType = null, actionCamStream = null;
+var actionProducts = []; // populated from lastData
+
+function openActionModal(type){
+  actionType = type;
+  var typeClass = type.toLowerCase();
+  document.getElementById("actionModalTitle").textContent = type;
+  var typeEl = document.getElementById("actionModalType");
+  typeEl.textContent = type.toUpperCase();
+  typeEl.className = "action-modal-type " + typeClass;
+
+  // Populate employee dropdown
+  var empSel = document.getElementById("actionEmp");
+  empSel.innerHTML = '<option value="">Select Employee</option>';
+  if(lastData && lastData.employees){
+    lastData.employees.forEach(function(e){
+      var o=document.createElement("option"); o.value=e; o.textContent=e;
+      empSel.appendChild(o);
+    });
+  }
+
+  // Populate product dropdown
+  var skuSel = document.getElementById("actionSku");
+  skuSel.innerHTML = '<option value="">Select Product</option>';
+  actionProducts = (lastData && lastData.products) ? lastData.products : [];
+  actionProducts.forEach(function(p){
+    var o=document.createElement("option"); o.value=p.sku;
+    o.textContent=p.sku+" · "+p.name; skuSel.appendChild(o);
+  });
+
+  // Remarks: required for FOC and Faulty, optional for Sample
+  var rmField = document.getElementById("actionRemarksField");
+  var rmLabel = document.getElementById("actionRemarksLabel");
+  var rmInput = document.getElementById("actionRemarks");
+  rmInput.value = "";
+  if(type === "Sample"){
+    rmLabel.innerHTML = "REMARKS <span style='color:var(--muted);font-size:10px'>(optional)</span>";
+    rmField.style.display = "flex";
+  } else {
+    rmLabel.innerHTML = "REMARKS <span style='color:var(--red)'>*</span>";
+    rmField.style.display = "flex";
+  }
+
+  // Camera: only for Faulty (ceremonial)
+  var camWrap = document.getElementById("actionCamWrap");
+  if(type === "Faulty"){
+    camWrap.style.display = "block";
+    startActionCam();
+  } else {
+    camWrap.style.display = "none";
+    stopActionCam();
+  }
+
+  document.getElementById("actionQty").value = 1;
+  document.getElementById("actionModalBg").classList.add("open");
+  validateActionForm();
+}
+
+function closeActionModal(){
+  document.getElementById("actionModalBg").classList.remove("open");
+  stopActionCam(); actionType = null;
+}
+
+function startActionCam(){
+  if(actionCamStream) return;
+  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}})
+    .then(function(stream){
+      actionCamStream = stream;
+      var v=document.getElementById("actionVideo");
+      v.srcObject=stream;
+      document.getElementById("actionCamPlaceholder").style.display="none";
+      document.getElementById("actionCamRec").style.display="block";
+    }).catch(function(){ document.getElementById("actionCamPlaceholder").textContent="🚫"; });
+}
+
+function stopActionCam(){
+  if(!actionCamStream) return;
+  actionCamStream.getTracks().forEach(function(t){t.stop();}); actionCamStream=null;
+  var v=document.getElementById("actionVideo"); if(v) v.srcObject=null;
+  var rec=document.getElementById("actionCamRec"); if(rec) rec.style.display="none";
+  var ph=document.getElementById("actionCamPlaceholder"); if(ph){ph.style.display="";ph.textContent="📷";}
+}
+
+function validateActionForm(){
+  var emp = document.getElementById("actionEmp").value;
+  var sku = document.getElementById("actionSku").value;
+  var qty = parseFloat(document.getElementById("actionQty").value)||0;
+  var rmk = document.getElementById("actionRemarks").value.trim();
+  var needRmk = (actionType === "FOC" || actionType === "Faulty");
+  var ok = emp && sku && qty > 0 && (!needRmk || rmk);
+  document.getElementById("actionSubmitBtn").disabled = !ok;
+}
+// Attach live validation
+document.addEventListener("DOMContentLoaded", function(){
+  ["actionEmp","actionSku","actionQty","actionRemarks"].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.addEventListener("input", validateActionForm);
+  });
+});
+
+async function submitAction(){
+  var emp = document.getElementById("actionEmp").value;
+  var sku = document.getElementById("actionSku").value;
+  var qty = parseFloat(document.getElementById("actionQty").value)||0;
+  var rmk = document.getElementById("actionRemarks").value.trim();
+  if(!emp||!sku||qty<=0){showToast("Please fill all required fields","err");return;}
+  if((actionType==="FOC"||actionType==="Faulty")&&!rmk){
+    showToast("Remarks required for "+actionType,"err"); return;
+  }
+
+  // Flash (Faulty camera - ceremonial capture)
+  if(actionType==="Faulty"){
+    var fl=document.getElementById("flash"); fl.classList.add("on"); setTimeout(function(){fl.classList.remove("on");},110);
+  }
+
+  var btn=document.getElementById("actionSubmitBtn");
+  btn.disabled=true; btn.textContent="Saving…";
+
+  try{
+    var resp=await fetch(SHEET_URL,{method:"POST",redirect:"follow",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({
+        action:"submitAction", store:"Raya 2026",
+        employee:emp, action_type:actionType, sku:sku,
+        quantity:qty, remarks:rmk
+      })
+    });
+    var r=await resp.json();
+    if(r.ok){
+      showToast(actionType+" recorded: "+sku+" × "+qty,"ok");
+      closeActionModal();
+      // Refresh stock tab if open so -Action col updates
+      if(document.getElementById("tab-stock").classList.contains("active")) loadStockTab();
+    } else {
+      showToast("Error: "+(r.error||"unknown"),"err");
+      btn.disabled=false; btn.textContent="Submit";
+    }
+  }catch(err){
+    showToast("Failed: "+err.message,"err");
+    btn.disabled=false; btn.textContent="Submit";
+  }
+}
+
 // ── Punch Modal ────────────────────────────────────────────
 var punchEmp = null, punchType = null, punchStream = null;
 
