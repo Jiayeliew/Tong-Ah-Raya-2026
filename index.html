@@ -124,10 +124,12 @@
   .feed-section{flex:1;min-width:120px;display:flex;flex-direction:column;padding:10px 12px;gap:6px;overflow:hidden;}
   .feed-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;max-height:140px;}
   .feed-item{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 9px;background:var(--bg);border:1px solid var(--border);border-radius:7px;flex-shrink:0;}
-  .fdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .fdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
   .fdot-in{background:var(--green);} .fdot-out{background:var(--red);}
-  .fname{font-weight:600;} .ftype{font-size:10px;color:var(--muted);}
-  .ftime{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+  .fdot-foc{background:var(--blue);} .fdot-sample{background:var(--gold);} .fdot-faulty{background:#f97316;} .fdot-neutral{background:var(--muted);}
+  .fname{font-weight:600;} .ftype{font-size:10px;color:var(--muted);flex-shrink:0;}
+  .fdetail{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px;}
+  .ftime{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0;}
   .settings-col{width:42px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:1px solid var(--border);}
   .settings-btn{writing-mode:vertical-rl;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);cursor:pointer;background:none;border:none;padding:8px;transition:color .15s;}
   .settings-btn:hover{color:var(--text);}
@@ -267,13 +269,19 @@
   /* Daily tasks col */
   .tasks-col{flex-shrink:0;min-width:160px;max-width:220px;display:flex;flex-direction:column;padding:12px 14px;gap:7px;border-right:1px solid var(--border);}
   .daily-task-list{display:grid;grid-template-columns:1fr;gap:4px;margin-top:2px;}
-  .daily-task-item{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;transition:all .12s;user-select:none;}
-  .daily-task-item:hover{border-color:var(--border2);background:var(--surface);}
-  .daily-task-item.done{background:var(--green-bg);border-color:var(--green-border);}
-  .daily-task-item.done .task-text{color:var(--green);text-decoration:line-through;opacity:.7;}
-  .task-check{width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .12s;}
-  .daily-task-item.done .task-check{background:var(--green);border-color:var(--green);color:#fff;}
-  .task-text{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);line-height:1.3;}
+  .daily-task-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:8px;border:1.5px solid transparent;background:var(--surface2);cursor:pointer;transition:all .15s;user-select:none;}
+  .daily-task-item:hover{background:var(--surface);}
+  .daily-task-item.done{opacity:.65;}
+  .daily-task-item.done .task-text{text-decoration:line-through;}
+  .task-check{width:18px;height:18px;border-radius:5px;border:2px solid;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .15s;}
+  .task-text{font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.3;}
+  /* Per-task colours applied via JS */
+  .tc-0{border-color:#6366f1;} .tc-0 .task-check{border-color:#6366f1;color:#6366f1;} .tc-0.done .task-check{background:#6366f1;color:#fff;}  .tc-0 .task-text{color:#6366f1;}
+  .tc-1{border-color:var(--gold);} .tc-1 .task-check{border-color:var(--gold);color:var(--gold);} .tc-1.done .task-check{background:var(--gold);color:#fff;} .tc-1 .task-text{color:var(--gold);}
+  .tc-2{border-color:var(--green);} .tc-2 .task-check{border-color:var(--green);color:var(--green);} .tc-2.done .task-check{background:var(--green);color:#fff;} .tc-2 .task-text{color:var(--green);}
+  .tc-3{border-color:var(--blue);} .tc-3 .task-check{border-color:var(--blue);color:var(--blue);} .tc-3.done .task-check{background:var(--blue);color:#fff;} .tc-3 .task-text{color:var(--blue);}
+  .tc-4{border-color:#f97316;} .tc-4 .task-check{border-color:#f97316;color:#f97316;} .tc-4.done .task-check{background:#f97316;color:#fff;} .tc-4 .task-text{color:#f97316;}
+  .tc-5{border-color:var(--red);} .tc-5 .task-check{border-color:var(--red);color:var(--red);} .tc-5.done .task-check{background:var(--red);color:#fff;} .tc-5 .task-text{color:var(--red);}
   .qa-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
   .qa-row{display:flex;gap:8px;}
 
@@ -331,10 +339,17 @@
     .panel-daily{border-right:none;border-bottom:1px solid var(--border);}
     .big-num .amt{font-size:48px;}
     .cam-wrap{width:100%!important;border-right:none;border-bottom:1px solid var(--border);}
-    .tasks-col{min-width:0;max-width:none;flex:1;}
-    .daily-task-list{grid-template-columns:1fr 1fr;}
     .tier-right{width:auto;}
-    /* SKU column visible on all screens */
+    /* Clock zone stacks on mobile */
+    .clock-zone{flex-direction:column;}
+    .emp-section,.actions-col,.feed-section,.tasks-col{border-right:none;border-bottom:1px solid var(--border);min-width:0;width:100%;}
+    .actions-col{flex-direction:row;flex-wrap:wrap;align-items:flex-start;gap:6px;}
+    .actions-col .zone-label{width:100%;}
+    .action-btns{flex-direction:row;flex-wrap:wrap;width:100%;}
+    .act-btn{flex:1;min-width:120px;}
+    .tasks-col{max-width:none;}
+    .daily-task-list{grid-template-columns:1fr 1fr;gap:5px;}
+    .settings-col{display:none;}
   }
 </style>
 </head>
@@ -422,25 +437,24 @@
     <!-- Actions column -->
     <div class="actions-col">
       <div class="zone-label">ACTIONS</div>
-      <div class="action-hint" id="actionHint">Select a staff member first</div>
       <div class="action-btns" id="actionBtns">
-        <button class="act-btn clock" onclick="triggerAction('clock')" disabled id="actClock">🕐 Clock In / Out</button>
-        <button class="act-btn foc"   onclick="triggerAction('FOC')"   disabled id="actFOC">📦 FOC</button>
-        <button class="act-btn sample" onclick="triggerAction('Sample')" disabled id="actSample">🧪 Sample</button>
-        <button class="act-btn faulty" onclick="triggerAction('Faulty')" disabled id="actFaulty">⚠️ Faulty</button>
+        <button class="act-btn clock" onclick="triggerAction('clock')">🕐 Clock In / Out</button>
+        <button class="act-btn foc"   onclick="triggerAction('FOC')">📦 FOC</button>
+        <button class="act-btn sample" onclick="triggerAction('Sample')">🧪 Sample</button>
+        <button class="act-btn faulty" onclick="triggerAction('Faulty')">⚠️ Faulty</button>
       </div>
     </div>
 
-    <!-- Daily Tasks -->
+    <!-- Recent feed (next to staff+actions) -->
+    <div class="feed-section">
+      <div class="zone-label">Today's Activity</div>
+      <div class="feed-scroll" id="feedScroll"></div>
+    </div>
+
+    <!-- Daily Tasks (right end, colourful) -->
     <div class="tasks-col">
       <div class="zone-label">DAILY TASKS</div>
       <div id="dailyTaskList" class="daily-task-list"></div>
-    </div>
-
-    <!-- Recent feed -->
-    <div class="feed-section">
-      <div class="zone-label">Recent</div>
-      <div class="feed-scroll" id="feedScroll"></div>
     </div>
 
     <div class="settings-col"><button class="settings-btn" onclick="openModal()">⚙ SETUP</button></div>
@@ -728,16 +742,17 @@ function renderEmps(emps){
 }
 
 function updateActionBtns(){
-  var has=!!selectedStaff;
-  var hint=document.getElementById("actionHint");
-  if(hint) hint.style.display=has?"none":"block";
-  ["actClock","actFOC","actSample","actFaulty"].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.disabled=!has;
-  });
+  // Buttons always enabled — triggerAction handles missing staff
 }
 
 function triggerAction(type){
-  if(!selectedStaff){showToast("Select a staff member first","err");return;}
+  if(!selectedStaff){
+    showToast("Select a staff member first","err");
+    // Flash the staff section to guide user
+    var grid=document.getElementById("empGrid");
+    if(grid){grid.style.outline="2px solid var(--gold)";setTimeout(function(){grid.style.outline="";},800);}
+    return;
+  }
   if(type==="clock"){
     openPunchModal(selectedStaff);
   } else {
@@ -1142,7 +1157,10 @@ async function submitAction(){
     });
     var r=await resp.json();
     if(r.ok){
-      showToast(actionType+" recorded: "+sku+" × "+qty,"ok");
+      var skuName = actionProducts.find(function(p){return p.sku===sku;});
+      var label = skuName ? skuName.sku : sku;
+      addFeed(emp, actionType, new Date().toLocaleTimeString("en-MY",{hour12:false,hour:"2-digit",minute:"2-digit"}), label+" ×"+qty);
+      showToast(actionType+" recorded: "+label+" × "+qty,"ok");
       closeActionModal();
       // Refresh stock tab if open so -Action col updates
       if(document.getElementById("tab-stock").classList.contains("active")) loadStockTab();
@@ -1230,12 +1248,20 @@ function doCapture(){
 
 // ── Clock action (legacy doAction kept for safety) ─────────
 function doAction(type){ if(punchEmp) doCapture(); }
-function addFeed(name,type,time){
+function addFeed(name, type, time, detail){
   var f=document.getElementById("feedScroll");
   var el=document.createElement("div"); el.className="feed-item";
-  el.innerHTML='<div class="fdot '+(type==="IN"?"fdot-in":"fdot-out")+'"></div><span class="fname">'+name+'</span><span class="ftype">'+type+'</span><span class="ftime">'+time+'</span>';
+  // dot colour by type
+  var dotClass="fdot-neutral";
+  if(type==="IN") dotClass="fdot-in";
+  else if(type==="OUT") dotClass="fdot-out";
+  else if(type==="FOC") dotClass="fdot-foc";
+  else if(type==="Sample") dotClass="fdot-sample";
+  else if(type==="Faulty") dotClass="fdot-faulty";
+  var detailHtml = detail ? '<span class="fdetail">'+detail+'</span>' : "";
+  el.innerHTML='<div class="fdot '+dotClass+'"></div><span class="fname">'+name+'</span><span class="ftype">'+type+'</span>'+detailHtml+'<span class="ftime">'+time+'</span>';
   f.insertBefore(el,f.firstChild);
-  while(f.children.length>15) f.removeChild(f.lastChild);
+  while(f.children.length>30) f.removeChild(f.lastChild);
 }
 
 // ── Toast ──────────────────────────────────────────────────
@@ -1262,8 +1288,9 @@ function renderDailyTasks(){
   list.innerHTML = "";
   DAILY_TASKS.forEach(function(task, i){
     var done = !!tasksDone[i];
+    var colorClass = "tc-"+(i%6);
     var div = document.createElement("div");
-    div.className = "daily-task-item" + (done ? " done" : "");
+    div.className = "daily-task-item "+colorClass+(done?" done":"");
     div.innerHTML = '<div class="task-check">'+(done?"✓":"")+'</div><span class="task-text">'+task+'</span>';
     div.onclick = function(){ tasksDone[i]=!tasksDone[i]; renderDailyTasks(); };
     list.appendChild(div);
