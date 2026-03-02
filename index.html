@@ -262,26 +262,28 @@
   .act-btn{height:34px;border-radius:8px;border:1.5px solid var(--border2);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;width:100%;}
   .act-btn:disabled{opacity:.35;cursor:not-allowed;}
   .act-btn:not(:disabled):active{transform:scale(.96);}
-  .act-btn.clock:not(:disabled){border-color:var(--border2);color:var(--text);}
-  .act-btn.foc:not(:disabled){border-color:var(--blue-border);color:var(--blue);background:var(--blue-bg);}
-  .act-btn.sample:not(:disabled){border-color:var(--gold-border);color:var(--gold);background:var(--gold-bg);}
-  .act-btn.faulty:not(:disabled){border-color:var(--red-border);color:var(--red);background:var(--red-bg);}
+  .act-btn.clock{border-color:var(--green-border);color:var(--green);background:var(--green-bg);}
+  .act-btn.foc{border-color:var(--blue-border);color:var(--blue);background:var(--blue-bg);}
+  .act-btn.sample{border-color:var(--gold-border);color:var(--gold);background:var(--gold-bg);}
+  .act-btn.faulty{border-color:var(--red-border);color:var(--red);background:var(--red-bg);}
+  .act-btn.sel{filter:brightness(.88);box-shadow:inset 0 0 0 2px rgba(0,0,0,.15);transform:scale(.97);}
   /* Daily tasks col */
-  .tasks-col{flex-shrink:0;min-width:160px;max-width:220px;display:flex;flex-direction:column;padding:12px 14px;gap:7px;border-right:1px solid var(--border);}
-  .daily-task-list{display:grid;grid-template-columns:1fr;gap:4px;margin-top:2px;}
-  .daily-task-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:8px;border:1.5px solid transparent;background:var(--surface2);cursor:pointer;transition:all .15s;user-select:none;}
-  .daily-task-item:hover{background:var(--surface);}
-  .daily-task-item.done{opacity:.65;}
+  .tasks-col{flex-shrink:0;min-width:160px;max-width:230px;display:flex;flex-direction:column;padding:12px 14px;gap:7px;border-right:1px solid var(--border);background:var(--gold-bg);}
+  .tasks-col .zone-label{color:var(--gold);}
+  .daily-task-list{display:grid;grid-template-columns:1fr;gap:5px;margin-top:2px;}
+  .daily-task-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;border:1.5px solid;background:rgba(255,255,255,.6);cursor:pointer;transition:all .15s;user-select:none;}
+  .daily-task-item:hover{background:rgba(255,255,255,.9);}
+  .daily-task-item.done{opacity:.55;}
   .daily-task-item.done .task-text{text-decoration:line-through;}
-  .task-check{width:18px;height:18px;border-radius:5px;border:2px solid;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .15s;}
-  .task-text{font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.3;}
-  /* Per-task colours applied via JS */
-  .tc-0{border-color:#6366f1;} .tc-0 .task-check{border-color:#6366f1;color:#6366f1;} .tc-0.done .task-check{background:#6366f1;color:#fff;}  .tc-0 .task-text{color:#6366f1;}
-  .tc-1{border-color:var(--gold);} .tc-1 .task-check{border-color:var(--gold);color:var(--gold);} .tc-1.done .task-check{background:var(--gold);color:#fff;} .tc-1 .task-text{color:var(--gold);}
-  .tc-2{border-color:var(--green);} .tc-2 .task-check{border-color:var(--green);color:var(--green);} .tc-2.done .task-check{background:var(--green);color:#fff;} .tc-2 .task-text{color:var(--green);}
-  .tc-3{border-color:var(--blue);} .tc-3 .task-check{border-color:var(--blue);color:var(--blue);} .tc-3.done .task-check{background:var(--blue);color:#fff;} .tc-3 .task-text{color:var(--blue);}
-  .tc-4{border-color:#f97316;} .tc-4 .task-check{border-color:#f97316;color:#f97316;} .tc-4.done .task-check{background:#f97316;color:#fff;} .tc-4 .task-text{color:#f97316;}
-  .tc-5{border-color:var(--red);} .tc-5 .task-check{border-color:var(--red);color:var(--red);} .tc-5.done .task-check{background:var(--red);color:#fff;} .tc-5 .task-text{color:var(--red);}
+  .task-check{width:17px;height:17px;border-radius:4px;border:2px solid;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:all .15s;background:transparent;}
+  .task-text{font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.3;font-weight:500;}
+  /* Rainbow — same muted design-system tone */
+  .tc-0{border-color:#9b7fe8;} .tc-0 .task-check{border-color:#9b7fe8;color:#9b7fe8;} .tc-0.done .task-check{background:#9b7fe8;color:#fff;} .tc-0 .task-text{color:#7c5cbf;}
+  .tc-1{border-color:var(--blue-border);} .tc-1 .task-check{border-color:var(--blue);color:var(--blue);} .tc-1.done .task-check{background:var(--blue);color:#fff;} .tc-1 .task-text{color:var(--blue);}
+  .tc-2{border-color:var(--green-border);} .tc-2 .task-check{border-color:var(--green);color:var(--green);} .tc-2.done .task-check{background:var(--green);color:#fff;} .tc-2 .task-text{color:var(--green);}
+  .tc-3{border-color:var(--gold-border);} .tc-3 .task-check{border-color:var(--gold);color:var(--gold);} .tc-3.done .task-check{background:var(--gold);color:#fff;} .tc-3 .task-text{color:var(--gold);}
+  .tc-4{border-color:#f0b38a;} .tc-4 .task-check{border-color:#e07a30;color:#e07a30;} .tc-4.done .task-check{background:#e07a30;color:#fff;} .tc-4 .task-text{color:#c45c10;}
+  .tc-5{border-color:var(--red-border);} .tc-5 .task-check{border-color:var(--red);color:var(--red);} .tc-5.done .task-check{background:var(--red);color:#fff;} .tc-5 .task-text{color:var(--red);}
   .qa-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
   .qa-row{display:flex;gap:8px;}
 
@@ -713,6 +715,7 @@ function renderDash(d){
 }
 
 var selectedStaff = null;
+var selectedAction = null; // 'clock','FOC','Sample','Faulty'
 
 function renderEmps(emps){
   var g=document.getElementById("empGrid"); g.innerHTML="";
@@ -723,7 +726,6 @@ function renderEmps(emps){
     (function(name){
       var b=document.createElement("button"); b.className="emp-btn"; b.textContent=name;
       b.onclick=function(){
-        // Toggle: click same name deselects
         if(selectedStaff===name){
           selectedStaff=null;
           b.classList.remove("sel");
@@ -732,7 +734,7 @@ function renderEmps(emps){
           document.querySelectorAll(".emp-btn").forEach(function(x){x.classList.remove("sel");});
           b.classList.add("sel");
         }
-        updateActionBtns();
+        checkAndTrigger();
       };
       g.appendChild(b);
       var opt=document.createElement("option"); opt.value=name; opt.textContent=name;
@@ -741,22 +743,37 @@ function renderEmps(emps){
   }
 }
 
-function updateActionBtns(){
-  // Buttons always enabled — triggerAction handles missing staff
-}
+function updateActionBtns(){ /* buttons always enabled */ }
 
 function triggerAction(type){
-  if(!selectedStaff){
-    showToast("Select a staff member first","err");
-    // Flash the staff section to guide user
-    var grid=document.getElementById("empGrid");
-    if(grid){grid.style.outline="2px solid var(--gold)";setTimeout(function(){grid.style.outline="";},800);}
-    return;
-  }
-  if(type==="clock"){
-    openPunchModal(selectedStaff);
+  // Toggle action selection
+  if(selectedAction===type){
+    selectedAction=null;
   } else {
-    openActionModal(type, selectedStaff);
+    selectedAction=type;
+  }
+  // Update button highlight
+  document.querySelectorAll(".act-btn").forEach(function(b){b.classList.remove("sel");});
+  if(selectedAction){
+    var map={"clock":"actClock","FOC":"actFOC","Sample":"actSample","Faulty":"actFaulty"};
+    var el=document.getElementById(map[selectedAction]);
+    if(el) el.classList.add("sel");
+  }
+  checkAndTrigger();
+}
+
+function checkAndTrigger(){
+  if(!selectedStaff || !selectedAction) return;
+  var staff=selectedStaff, action=selectedAction;
+  // Clear selections first
+  selectedStaff=null; selectedAction=null;
+  document.querySelectorAll(".emp-btn").forEach(function(b){b.classList.remove("sel");});
+  document.querySelectorAll(".act-btn").forEach(function(b){b.classList.remove("sel");});
+  // Trigger
+  if(action==="clock"){
+    openPunchModal(staff);
+  } else {
+    openActionModal(action, staff);
   }
 }
 
@@ -1085,10 +1102,6 @@ function openActionModal(type, prefilledStaff){
 function closeActionModal(){
   document.getElementById("actionModalBg").classList.remove("open");
   stopActionCam(); actionType = null;
-  // Deselect staff after action
-  selectedStaff = null;
-  document.querySelectorAll(".emp-btn").forEach(function(b){b.classList.remove("sel");});
-  updateActionBtns();
 }
 
 function startActionCam(){
@@ -1189,10 +1202,6 @@ function closePunchModal(){
   document.getElementById("punchModalBg").classList.remove("open");
   stopPunchCam();
   punchEmp = null; punchType = null;
-  // Deselect staff after action
-  selectedStaff = null;
-  document.querySelectorAll(".emp-btn").forEach(function(b){b.classList.remove("sel");});
-  updateActionBtns();
 }
 function punchSelect(type){
   punchType = type;
