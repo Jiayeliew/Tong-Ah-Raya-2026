@@ -1257,20 +1257,67 @@ function doCapture(){
 
 // ── Clock action (legacy doAction kept for safety) ─────────
 function doAction(type){ if(punchEmp) doCapture(); }
-function addFeed(name, type, time, detail){
+// ── Activity Feed (localStorage persistent, clears at midnight) ──
+function getTodayKey(){ return "feed_"+new Date().toLocaleDateString("en-MY"); }
+
+function loadFeedFromStorage(){
+  try{
+    var key=getTodayKey();
+    var raw=localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+
+function saveFeedToStorage(items){
+  try{
+    // Clear yesterday keys
+    Object.keys(localStorage).forEach(function(k){
+      if(k.startsWith("feed_") && k!==getTodayKey()) localStorage.removeItem(k);
+    });
+    localStorage.setItem(getTodayKey(), JSON.stringify(items));
+  }catch(e){}
+}
+
+function renderFeed(items){
   var f=document.getElementById("feedScroll");
-  var el=document.createElement("div"); el.className="feed-item";
-  // dot colour by type
-  var dotClass="fdot-neutral";
-  if(type==="IN") dotClass="fdot-in";
-  else if(type==="OUT") dotClass="fdot-out";
-  else if(type==="FOC") dotClass="fdot-foc";
-  else if(type==="Sample") dotClass="fdot-sample";
-  else if(type==="Faulty") dotClass="fdot-faulty";
-  var detailHtml = detail ? '<span class="fdetail">'+detail+'</span>' : "";
-  el.innerHTML='<div class="fdot '+dotClass+'"></div><span class="fname">'+name+'</span><span class="ftype">'+type+'</span>'+detailHtml+'<span class="ftime">'+time+'</span>';
-  f.insertBefore(el,f.firstChild);
-  while(f.children.length>30) f.removeChild(f.lastChild);
+  f.innerHTML="";
+  items.forEach(function(item){
+    var el=document.createElement("div"); el.className="feed-item";
+    var dotClass="fdot-neutral";
+    if(item.type==="IN") dotClass="fdot-in";
+    else if(item.type==="OUT") dotClass="fdot-out";
+    else if(item.type==="FOC") dotClass="fdot-foc";
+    else if(item.type==="Sample") dotClass="fdot-sample";
+    else if(item.type==="Faulty") dotClass="fdot-faulty";
+    var detailHtml=item.detail?'<span class="fdetail">'+item.detail+'</span>':"";
+    el.innerHTML='<div class="fdot '+dotClass+'"></div><span class="fname">'+item.name+'</span><span class="ftype">'+item.type+'</span>'+detailHtml+'<span class="ftime">'+item.time+'</span>';
+    f.appendChild(el);
+  });
+}
+
+function addFeed(name, type, time, detail){
+  var items=loadFeedFromStorage();
+  items.unshift({name:name,type:type,time:time,detail:detail||""});
+  if(items.length>100) items=items.slice(0,100);
+  saveFeedToStorage(items);
+  renderFeed(items);
+}
+
+function initFeed(){
+  var items=loadFeedFromStorage();
+  if(items.length) renderFeed(items);
+  // Auto-clear at midnight
+  setInterval(function(){
+    var key=getTodayKey();
+    var stored=Object.keys(localStorage).filter(function(k){return k.startsWith("feed_");});
+    stored.forEach(function(k){ if(k!==key) localStorage.removeItem(k); });
+    // If date changed since last render, clear the feed display
+    var f=document.getElementById("feedScroll");
+    if(f && f.dataset.date && f.dataset.date!==key){
+      f.innerHTML=""; f.dataset.date=key;
+    }
+    if(f) f.dataset.date=key;
+  },30000);
 }
 
 // ── Toast ──────────────────────────────────────────────────
@@ -1330,7 +1377,7 @@ async function testConn(){
 }
 function saveSettings(){SHEET_URL=document.getElementById("s_url").value.trim();closeModal();startAutoSync();showToast("Saved","ok");}
 
-tick(); setInterval(tick,1000); startAutoSync(); renderDailyTasks(); updateActionBtns();
+tick(); setInterval(tick,1000); startAutoSync(); renderDailyTasks(); updateActionBtns(); initFeed();
 </script>
 </body>
 </html>
