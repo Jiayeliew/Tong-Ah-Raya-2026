@@ -823,11 +823,10 @@ function renderDash(d){
     if(bpEl) bpEl.textContent=rate+"%";
     setBadge(document.getElementById(bdId),cur,tgt);
   }
+  var r1=d.tt1_rate||1, r2=d.tt2_rate||1.5, r3=d.tt3_rate||2;
   totalTierSimple("tt1Bar","tt1Pct","tt1Tgt","tt1BonusPct","tt1Badge",ts,tt1,r1);
   totalTierSimple("tt2Bar","tt2Pct","tt2Tgt","tt2BonusPct","tt2Badge",ts,tt2,r2);
   totalTierSimple("tt3Bar","tt3Pct","tt3Tgt","tt3BonusPct","tt3Badge",ts,tt3,r3);
-
-  var r1=d.tt1_rate||1, r2=d.tt2_rate||1.5, r3=d.tt3_rate||2;
   var BASE=0.5, activePct=BASE, tierLabel=BASE+"% (base)";
   if(tt3&&ts>=tt3)     {activePct=r3;tierLabel=r3+"% (TT3 unlocked)";}
   else if(tt2&&ts>=tt2){activePct=r2;tierLabel=r2+"% (TT2 unlocked)";}
