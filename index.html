@@ -1096,10 +1096,36 @@ async function submitStock(){
     document.getElementById("stockSubmittedBanner").style.display="block";
     btn.textContent="✅ Submitted — Submit Again to Update"; btn.disabled=false;
     stockData=null;
+    autoCompleteStockTask();
   }catch(err){
-    showToast("Save failed: "+err.message,"err");
+    showToast("Save failed: "+err.message,"err",6000);
     btn.disabled=false; btn.textContent="Submit Stock Count";
   }
+}
+
+function autoCompleteStockTask(){
+  var task=DAILY_TASKS.find(function(t){return t.id==="stockcount";});
+  if(!task||tasksDone["stockcount"]) return;
+  var now=new Date();
+  var time=now.toLocaleTimeString("en-MY",{hour12:false,hour:"2-digit",minute:"2-digit"});
+  var date=now.toLocaleDateString("en-MY");
+  tasksDone["stockcount"]={time:time,reward:task.reward};
+  saveTaskState();
+  var earned=DAILY_TASKS.reduce(function(s,t){return s+(tasksDone[t.id]?t.reward:0);},0);
+  var allDone=DAILY_TASKS.every(function(t){return !!tasksDone[t.id];});
+  var total=earned+(allDone?1:0);
+  // updateTaskReward: no Drive, just writes col R — safe and fast
+  fetch(SHEET_URL,{method:"POST",redirect:"follow",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({action:"updateTaskReward",
+      store:(lastData&&lastData.store)||"Unknown",
+      date:date,time:time,totalReward:total})
+  }).then(function(r){return r.json();})
+    .then(function(r){ if(!r.ok) showToast("Col R error: "+(r.error||"?"),"err",6000); })
+    .catch(function(e){ showToast("Col R error: "+e.message,"err",6000); });
+  addFeed("📦 Stock Count Done!","task",time,"+RM"+task.reward+(allDone?" 🎉 All tasks done! +RM1 bonus":""));
+  renderDailyTasks();
+  showToast("📦 Stock Count Task auto-complete +RM"+task.reward,"ok");
 }
 
 // ── Reorder Tab ────────────────────────────────────────────
@@ -1488,7 +1514,7 @@ function initFeed(){
 function showToast(msg,type,duration){
   var t=document.getElementById("toast"); t.textContent=msg; t.className="toast "+(type||"info");
   void t.offsetWidth; t.classList.add("show");
-  setTimeout(function(){t.classList.remove("show");},(duration||2500));
+  setTimeout(function(){t.classList.remove("show");},(duration||(type==="err"?5000:2500)));
 }
 
 // ── Daily Tasks System ─────────────────────────────────────
@@ -1554,25 +1580,11 @@ function openTaskModal(taskId){
   currentTaskId=taskId; taskPhotos={};
 
   if(taskId==="stockcount"){
-    var submitted=stockData&&stockData.submitted;
-    if(!submitted){ showToast("Complete Stock Count first","err"); return; }
-    var scTime=new Date().toLocaleTimeString("en-MY",{hour12:false,hour:"2-digit",minute:"2-digit"});
-    var scDate=new Date().toLocaleDateString("en-MY");
-    tasksDone[taskId]={time:scTime,reward:task.reward};
-    saveTaskState();
-    // Calculate new total and update col R
-    var scEarned=DAILY_TASKS.reduce(function(s,t){return s+(tasksDone[t.id]?t.reward:0);},0);
-    var scAllDone=DAILY_TASKS.every(function(t){return !!tasksDone[t.id];});
-    var scTotal=scEarned+(scAllDone?1:0);
-    fetch(SHEET_URL,{method:"POST",redirect:"follow",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"uploadTaskPhotos",task:"stockcount",
-        taskLabel:"Stock Count",store:(lastData&&lastData.store)||"Unknown",
-        date:scDate,time:scTime,photos:[],totalReward:scTotal})
-    }).catch(function(){});
-    addFeed("📦 Stock Count Done!","task",scTime,"+RM"+task.reward+(scAllDone?" 🎉 All tasks complete! +RM1 bonus":""));
-    renderDailyTasks();
-    showToast("Stock Count done ✓  +RM"+task.reward,"ok");
+    if(tasksDone["stockcount"]){
+      showToast("Stock Count already done ✓","ok");
+    } else {
+      showToast("Go to Stock Count tab and submit — task auto-completes","err",4000);
+    }
     return;
   }
 
@@ -1717,13 +1729,25 @@ async function submitTask(){
     var allBonus = allDone ? 1 : 0;
     var totalReward = earned + allBonus;
 
-    var resp=await fetch(SHEET_URL,{method:"POST",redirect:"follow",
+    // Step 1: Write col R immediately (fast, no Drive)
+    var rewardResp=await fetch(SHEET_URL,{method:"POST",redirect:"follow",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"uploadTaskPhotos",task:task.id,taskLabel:task.label,
+      body:JSON.stringify({action:"updateTaskReward",
         store:(lastData&&lastData.store)||"Unknown",date:date,time:time,
-        photos:photos, totalReward:totalReward})});
-    var r=await resp.json();
-    if(!r.ok) throw new Error(r.error||"Upload failed");
+        totalReward:totalReward})});
+    var rr=await rewardResp.json();
+    if(!rr.ok) throw new Error(rr.error||"Col R write failed");
+    // Step 2: Upload photos async (non-blocking)
+    var hasPhotos=photos.some(function(p){return p.data&&p.data!="no-cam"&&p.data!="";});
+    if(hasPhotos){
+      fetch(SHEET_URL,{method:"POST",redirect:"follow",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify({action:"uploadTaskPhotos",task:task.id,taskLabel:task.label,
+          store:(lastData&&lastData.store)||"Unknown",date:date,time:time,
+          photos:photos,totalReward:totalReward})
+      }).catch(function(e){console.warn("Photo upload:",e);});
+    }
+    var r={ok:true};
 
     tasksDone[task.id]={time:time,reward:task.reward};
     saveTaskState();
