@@ -678,6 +678,7 @@
 <script>
 var SHEET_URL = "https://script.google.com/macros/s/AKfycbwuAR5LAOq9bmvQBSMisn9KohzpoRSKHX4DkD-3CwYqijydkdLPM4vRHtUUKqWJb6gQ/exec";
 var selEmp=null, camStream=null, syncTimer=null, lastData=null, stockData=null;
+var t3UnlockShown=false; // only show T3 unlock popup once per session
 
 // ── Clock ──────────────────────────────────────────────────
 function tick(){
@@ -735,7 +736,8 @@ function renderDash(d){
   var t1=d.t1||0,t2=d.t2||0,t3=d.t3||0;
   var b1=d.bonus1||0,b2=d.bonus2||0,b3=d.bonus3||0,tb=d.total_bonus||0;
   var tt1=d.tt1||0,tt2=d.tt2||0,tt3=d.tt3||0;
-  var p1=d.tt1_pct||0,p2=d.tt2_pct||0,p3=d.tt3_pct||0;
+  // TT% calculated frontend from total_sales vs TT targets (not from Sheets)
+  var p1=d.tt1_pct||0,p2=d.tt2_pct||0,p3=d.tt3_pct||0; // keep for comm calc fallback
 
   animN(document.getElementById("dailyAmt"),ds);
   animN(document.getElementById("totalAmt"),ts);
@@ -750,7 +752,33 @@ function renderDash(d){
   }
   dailyTier("t1Bar","t1Pct","t1Tgt","t1Bonus","t1Badge",ds,t1,b1);
   dailyTier("t2Bar","t2Pct","t2Tgt","t2Bonus","t2Badge",ds,t2,b2);
-  dailyTier("t3Bar","t3Pct","t3Tgt","t3Bonus","t3Badge",ds,t3,b3);
+
+  // T3: locked until T1 is hit today
+  var t3unlocked = t3 > 0 && ds >= t1 && t1 > 0;
+  var t3row = document.getElementById("t3Bar") && document.getElementById("t3Bar").closest(".tier-row");
+  if(t3 > 0){
+    if(t3unlocked){
+      dailyTier("t3Bar","t3Pct","t3Tgt","t3Bonus","t3Badge",ds,t3,b3);
+      if(t3row) t3row.style.opacity="1";
+    } else {
+      // Show locked state
+      document.getElementById("t3Bar").style.width="0%";
+      document.getElementById("t3Pct").textContent="🔒";
+      document.getElementById("t3Tgt").textContent="Hit T1 to unlock";
+      document.getElementById("t3Bonus").textContent="—";
+      document.getElementById("t3Badge").textContent="🔒";
+      document.getElementById("t3Badge").className="badge bm";
+      if(t3row) t3row.style.opacity="0.45";
+    }
+  } else {
+    // T3 not yet set by system
+    document.getElementById("t3Bar").style.width="0%";
+    document.getElementById("t3Pct").textContent="—";
+    document.getElementById("t3Tgt").textContent="🔒 Locked";
+    document.getElementById("t3Bonus").textContent="—";
+    document.getElementById("t3Badge").textContent="—";
+    if(t3row) t3row.style.opacity="0.45";
+  }
 
   var cA=document.getElementById("commAmt"),cS=document.getElementById("commStatus"),dc=document.getElementById("dailyCard");
   var earned=0;
@@ -761,6 +789,18 @@ function renderDash(d){
   animN(cA,earned);
   document.getElementById("totalBonusAmt").textContent=(tb+earned).toLocaleString();
 
+  // T3 unlock popup — show once when T1 is first hit
+  if(t3 > 0 && ds >= t1 && t1 > 0 && !t3UnlockShown && lastData && lastData.t1 > 0){
+    var prevDs = lastData ? (lastData.daily_sales||0) : 0;
+    // Only trigger if we just crossed T1 (not already shown)
+    if(ds >= t1){
+      t3UnlockShown = true;
+      setTimeout(function(){
+        showToast("🎉 T1 Hit! T3 Unlocked → RM "+t3.toLocaleString()+" — push for more!","ok",5000);
+      }, 500);
+    }
+  }
+
   function totalTier(bId,pId,tId,bpId,bdId,cur,tgt,rate){
     var pct=tgt?Math.min(cur/tgt*100,100):0;
     document.getElementById(bId).style.width=pct+"%";
@@ -769,14 +809,30 @@ function renderDash(d){
     document.getElementById(bpId).textContent=rate?rate+"% comm":"—";
     setBadge(document.getElementById(bdId),cur,tgt);
   }
-  totalTier("tt1Bar","tt1Pct","tt1Tgt","tt1BonusPct","tt1Badge",ts,tt1,p1);
-  totalTier("tt2Bar","tt2Pct","tt2Tgt","tt2BonusPct","tt2Badge",ts,tt2,p2);
-  totalTier("tt3Bar","tt3Pct","tt3Tgt","tt3BonusPct","tt3Badge",ts,tt3,p3);
+  // Calculate TT% frontend from total_sales vs TT targets
+  var tt1pct = tt1 ? Math.min(ts/tt1*100, 100) : 0;
+  var tt2pct = tt2 ? Math.min(ts/tt2*100, 100) : 0;
+  var tt3pct = tt3 ? Math.min(ts/tt3*100, 100) : 0;
+
+  function totalTierSimple(bId,pId,tId,bdId,cur,tgt){
+    var pct=tgt?Math.min(cur/tgt*100,100):0;
+    document.getElementById(bId).style.width=pct+"%";
+    document.getElementById(pId).textContent=tgt?pct.toFixed(0)+"%":"—";
+    document.getElementById(tId).textContent=tgt?"RM "+tgt.toLocaleString():"—";
+    setBadge(document.getElementById(bdId),cur,tgt);
+  }
+  totalTierSimple("tt1Bar","tt1Pct","tt1Tgt","tt1Badge",ts,tt1);
+  totalTierSimple("tt2Bar","tt2Pct","tt2Tgt","tt2Badge",ts,tt2);
+  totalTierSimple("tt3Bar","tt3Pct","tt3Tgt","tt3Badge",ts,tt3);
+  // Hide tt BonusPct (no longer used - comm % comes from TT tiers)
+  ["tt1BonusPct","tt2BonusPct","tt3BonusPct"].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.textContent="";
+  });
 
   var BASE=0.5, activePct=BASE, tierLabel=BASE+"% (base)";
-  if(p3&&ts>=tt3)     {activePct=p3;tierLabel=p3+"% (TT3 unlocked)";}
-  else if(p2&&ts>=tt2){activePct=p2;tierLabel=p2+"% (TT2 unlocked)";}
-  else if(p1&&ts>=tt1){activePct=p1;tierLabel=p1+"% (TT1 unlocked)";}
+  if(tt3&&ts>=tt3)     {activePct=p3||1.5;tierLabel=(p3||1.5)+"% (TT3 unlocked)";}
+  else if(tt2&&ts>=tt2){activePct=p2||1.2;tierLabel=(p2||1.2)+"% (TT2 unlocked)";}
+  else if(tt1&&ts>=tt1){activePct=p1||1.0;tierLabel=(p1||1.0)+"% (TT1 unlocked)";}
   var calcComm=ts?parseFloat((ts*activePct/100).toFixed(2)):0;
   document.getElementById("overallComm").textContent=calcComm.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
   // Task reward from Sheets (col R)
@@ -1431,10 +1487,10 @@ function initFeed(){
 }
 
 // ── Toast ──────────────────────────────────────────────────
-function showToast(msg,type){
+function showToast(msg,type,duration){
   var t=document.getElementById("toast"); t.textContent=msg; t.className="toast "+(type||"info");
   void t.offsetWidth; t.classList.add("show");
-  setTimeout(function(){t.classList.remove("show");},2500);
+  setTimeout(function(){t.classList.remove("show");},(duration||2500));
 }
 
 // ── Daily Tasks System ─────────────────────────────────────
