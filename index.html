@@ -459,10 +459,15 @@
           <div class="overall-amt"><span class="rm">RM</span><span id="overallComm">—</span></div>
           <div class="overall-pct-row" id="overallPctRow">—</div>
         </div>
-        <div class="overall-chip" id="taskRewardChip" style="display:none;">
-          <div class="sec-label">Task Reward</div>
+        <div class="overall-chip" id="taskRewardChip">
+          <div class="sec-label">Today Earned</div>
           <div class="overall-amt" style="font-size:22px;"><span class="rm">RM</span><span id="taskRewardAmt">0</span></div>
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:1px;" id="taskRewardSub">—</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:1px;" id="taskRewardSub">DAILY MAX RM5</div>
+        </div>
+        <div class="overall-chip" id="taskTotalChip">
+          <div class="sec-label">Total Earned</div>
+          <div class="overall-amt" style="font-size:22px;"><span class="rm">RM</span><span id="taskTotalAmt">0</span></div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:1px;">ALL TIME</div>
         </div>
       </div>
       <div class="tiers">
@@ -763,17 +768,12 @@ function renderDash(d){
   var calcComm=ts?parseFloat((ts*activePct/100).toFixed(2)):0;
   document.getElementById("overallComm").textContent=calcComm.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
   // Task reward from Sheets (col R)
+  // Today Earned
   var taskRew = d.task_reward || 0;
-  var trChip = document.getElementById("taskRewardChip");
-  if(trChip){
-    if(taskRew > 0){
-      document.getElementById("taskRewardAmt").textContent = taskRew.toFixed(2);
-      document.getElementById("taskRewardSub").textContent = "TODAY";
-      trChip.style.display = "";
-    } else {
-      trChip.style.display = "none";
-    }
-  }
+  document.getElementById("taskRewardAmt").textContent = taskRew.toFixed(0);
+  // Total Earned
+  var taskTotal = d.total_task_reward || 0;
+  document.getElementById("taskTotalAmt").textContent = taskTotal.toFixed(0);
   document.getElementById("overallPctRow").textContent=ts?tierLabel+" × RM "+ts.toLocaleString():"—";
 }
 
@@ -1426,13 +1426,13 @@ function showToast(msg,type){
 
 // ── Daily Tasks System ─────────────────────────────────────
 var DAILY_TASKS = [
-  { id:"morning",    icon:"🌅", label:"Morning Setup",   reward:1,
-    photos:[{label:"Display View 1"},{label:"Display View 2"},{label:"Packing Area"},{label:"Sample Tray"}] },
-  { id:"midday",     icon:"☀️", label:"Midday Check",    reward:1,
-    photos:[{label:"Display View 1"},{label:"Display View 2"},{label:"Packing Area"},{label:"Sample Cutting Area"}] },
-  { id:"closing",    icon:"🌙", label:"Closing Cleanup", reward:1,
-    photos:[{label:"Utensils Cleaned"},{label:"Sample Trays"},{label:"Rubbish Bin"},{label:"Tidy View 1"},{label:"Tidy View 2"},{label:"Store Closed"}] },
-  { id:"stockcount", icon:"📦", label:"Stock Count",     reward:1, photos:[] }
+  { id:"morning",    icon:"🌅", label:"Morning Setup",   time:"9am–10am",   reward:1,
+    photos:[{label:"Kiosk View 1"},{label:"Kiosk View 2"},{label:"Packing Area"},{label:"Sample Tray (Ready To Serve)"}] },
+  { id:"midday",     icon:"☀️", label:"Midday Check",    time:"2pm–3pm",    reward:1,
+    photos:[{label:"Kiosk View 1"},{label:"Kiosk View 2"},{label:"Packing Area"},{label:"Sample Cutting Area"}] },
+  { id:"closing",    icon:"🌙", label:"Closing Cleanup", time:"9.30pm–10.30pm", reward:1,
+    photos:[{label:"Kiosk View 1"},{label:"Kiosk View 2"},{label:"Rubbish Bin"},{label:"Utensils Cleaned"},{label:"Sample Trays"},{label:"Store Closed"}] },
+  { id:"stockcount", icon:"📦", label:"Stock Count",     time:"",           reward:1, photos:[] }
 ];
 
 var tasksDone    = {};
@@ -1459,7 +1459,8 @@ function renderDailyTasks(){
     var div=document.createElement("div");
     div.className="daily-task-item tc-"+i+(done?" done":"");
     div.innerHTML='<div class="task-check">'+(done?"✓":"")+'</div>'
-      +'<span class="task-text"><span style="margin-right:4px">'+task.icon+'</span>'+task.label+'</span>'
+      +'<span class="task-text"><span style="margin-right:4px">'+task.icon+'</span>'+task.label
+      +(task.time?'<span style="font-size:10px;color:var(--muted);margin-left:5px;font-family:DM Mono,monospace;">'+task.time+'</span>':"")+'</span>'
       +'<span style="margin-left:auto;font-size:10px;font-family:DM Mono,monospace;flex-shrink:0;opacity:.7">RM'+task.reward+'</span>';
     if(!done) div.onclick=function(){ openTaskModal(task.id); };
     list.appendChild(div);
