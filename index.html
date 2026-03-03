@@ -273,6 +273,14 @@
   .act-btn.sel.foc{background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important;transform:scale(.97);}
   .act-btn.sel.sample{background:var(--gold)!important;color:#fff!important;border-color:var(--gold)!important;transform:scale(.97);}
   .act-btn.sel.faulty{background:var(--red)!important;color:#fff!important;border-color:var(--red)!important;transform:scale(.97);}
+  /* Task Earn Chip */
+  .task-earn-chip{background:linear-gradient(135deg,var(--gold-bg) 0%,#fff8e1 100%);border:1.5px solid var(--gold-border);border-radius:12px;padding:10px 12px;}
+  .task-earn-row{display:flex;align-items:center;justify-content:space-around;gap:8px;}
+  .task-earn-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:3px;}
+  .task-earn-amt{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--gold);line-height:1;}
+  .task-earn-rm{font-size:11px;margin-right:1px;}
+  .task-earn-divider{width:1px;height:32px;background:var(--gold-border);}
+
   /* Daily tasks col */
   .tasks-col{flex-shrink:0;min-width:160px;max-width:230px;display:flex;flex-direction:column;padding:12px 14px;gap:7px;border-right:1px solid var(--border);background:var(--gold-bg);}
   .tasks-col .zone-label{color:var(--gold);}
@@ -459,16 +467,7 @@
           <div class="overall-amt"><span class="rm">RM</span><span id="overallComm">—</span></div>
           <div class="overall-pct-row" id="overallPctRow">—</div>
         </div>
-        <div class="overall-chip" id="taskRewardChip">
-          <div class="sec-label">Today Earned</div>
-          <div class="overall-amt" style="font-size:22px;"><span class="rm">RM</span><span id="taskRewardAmt">0</span></div>
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:1px;" id="taskRewardSub">DAILY MAX RM5</div>
-        </div>
-        <div class="overall-chip" id="taskTotalChip">
-          <div class="sec-label">Total Earned</div>
-          <div class="overall-amt" style="font-size:22px;"><span class="rm">RM</span><span id="taskTotalAmt">0</span></div>
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:1px;">ALL TIME</div>
-        </div>
+
       </div>
       <div class="tiers">
         <div class="tier-row"><div class="tier-pill pill-t">TT1</div><div class="bar-wrap"><div class="bar-fill ftt1" id="tt1Bar" style="width:0"></div></div><div class="tier-right"><span class="tier-tgt" id="tt1Tgt">—</span><span class="tier-bonus-pct" id="tt1BonusPct">—</span><span class="tier-pct" id="tt1Pct">—</span><span class="badge bm" id="tt1Badge">—</span></div></div>
@@ -507,7 +506,20 @@
 
     <!-- Daily Tasks (right end, colourful) -->
     <div class="tasks-col">
-      <div class="zone-label">DAILY TASKS <span id="taskRewardTotal" style="margin-left:6px;font-family:'DM Sans',sans-serif;font-size:10px;color:var(--gold);font-weight:700;"></span></div>
+      <div class="zone-label">DAILY TASKS</div>
+      <div class="task-earn-chip">
+        <div class="task-earn-row">
+          <div>
+            <div class="task-earn-lbl">🎯 Today</div>
+            <div class="task-earn-amt"><span class="task-earn-rm">RM</span><span id="taskRewardAmt">0</span></div>
+          </div>
+          <div class="task-earn-divider"></div>
+          <div>
+            <div class="task-earn-lbl">🏆 Total</div>
+            <div class="task-earn-amt"><span class="task-earn-rm">RM</span><span id="taskTotalAmt">0</span></div>
+          </div>
+        </div>
+      </div>
       <div id="dailyTaskList" class="daily-task-list"></div>
     </div>
 
@@ -1476,8 +1488,7 @@ function renderDailyTasks(){
     +'<span class="task-text">🏆 Complete all tasks</span>'
     +'<span style="margin-left:auto;font-size:10px;font-family:DM Mono,monospace;flex-shrink:0;opacity:.7">RM1</span>';
   list.appendChild(bonusDiv);
-  var el=document.getElementById("taskRewardTotal");
-  if(el) el.textContent=grandTotal>0?"RM"+grandTotal+" earned":"";
+  // Today Earned shown in task-earn-chip, updated via renderDash
 }
 
 // ── Task Modal ──────────────────────────────────────────────
