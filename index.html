@@ -1501,10 +1501,24 @@ function openTaskModal(taskId){
 
   if(taskId==="stockcount"){
     var submitted=stockData&&stockData.submitted;
-    if(submitted){
-      tasksDone[taskId]={staff:"auto",time:new Date().toLocaleTimeString("en-MY",{hour12:false,hour:"2-digit",minute:"2-digit"}),reward:task.reward};
-      saveTaskState(); renderDailyTasks(); showToast("Stock Count done ✓","ok");
-    } else { showToast("Complete Stock Count first","err"); }
+    if(!submitted){ showToast("Complete Stock Count first","err"); return; }
+    var scTime=new Date().toLocaleTimeString("en-MY",{hour12:false,hour:"2-digit",minute:"2-digit"});
+    var scDate=new Date().toLocaleDateString("en-MY");
+    tasksDone[taskId]={time:scTime,reward:task.reward};
+    saveTaskState();
+    // Calculate new total and update col R
+    var scEarned=DAILY_TASKS.reduce(function(s,t){return s+(tasksDone[t.id]?t.reward:0);},0);
+    var scAllDone=DAILY_TASKS.every(function(t){return !!tasksDone[t.id];});
+    var scTotal=scEarned+(scAllDone?1:0);
+    fetch(SHEET_URL,{method:"POST",redirect:"follow",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action:"uploadTaskPhotos",task:"stockcount",
+        taskLabel:"Stock Count",store:(lastData&&lastData.store)||"Unknown",
+        date:scDate,time:scTime,photos:[],totalReward:scTotal})
+    }).catch(function(){});
+    addFeed("📦 Stock Count Done!","task",scTime,"+RM"+task.reward+(scAllDone?" 🎉 All tasks complete! +RM1 bonus":""));
+    renderDailyTasks();
+    showToast("Stock Count done ✓  +RM"+task.reward,"ok");
     return;
   }
 
