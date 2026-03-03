@@ -834,6 +834,14 @@ function renderDash(d){
   var calcComm=ts?parseFloat((ts*activePct/100).toFixed(2)):0;
   document.getElementById("overallComm").textContent=calcComm.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
   // Task reward from Sheets (col R)
+  // Sync tasksDone from Sheets (cross-device source of truth)
+  if(d.completed_tasks && d.completed_tasks.length>0){
+    d.completed_tasks.forEach(function(t){
+      if(!tasksDone[t.taskId]) tasksDone[t.taskId]={time:t.time,reward:t.reward};
+    });
+    saveTaskState();
+    renderDailyTasks();
+  }
   // Today Earned
   var taskRew = d.task_reward || 0;
   document.getElementById("taskRewardAmt").textContent = taskRew.toFixed(0);
@@ -1119,7 +1127,7 @@ function autoCompleteStockTask(){
     headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify({action:"updateTaskReward",
       store:(lastData&&lastData.store)||"Unknown",
-      date:date,time:time,totalReward:total})
+      date:date,time:time,totalReward:total,taskId:"stockcount",taskLabel:"Stock Count",reward:1})
   }).then(function(r){return r.json();})
     .then(function(r){ if(!r.ok) showToast("Col R error: "+(r.error||"?"),"err",6000); })
     .catch(function(e){ showToast("Col R error: "+e.message,"err",6000); });
@@ -1734,7 +1742,7 @@ async function submitTask(){
       headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({action:"updateTaskReward",
         store:(lastData&&lastData.store)||"Unknown",date:date,time:time,
-        totalReward:totalReward})});
+        totalReward:totalReward,taskId:task.id,taskLabel:task.label,reward:task.reward})});
     var rr=await rewardResp.json();
     if(!rr.ok) throw new Error(rr.error||"Col R write failed");
     // Step 2: Upload photos async (non-blocking)
