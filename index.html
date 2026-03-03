@@ -1515,6 +1515,8 @@ function openTaskModal(taskId){
     grid.appendChild(slot);
   });
 
+  // Ensure grid is visible (in case previous session left camera open)
+  showTaskGrid();
   document.getElementById("taskModalBg").classList.add("open");
 }
 
@@ -1529,36 +1531,36 @@ function checkTaskReady(){
   document.getElementById("taskSubmitBtn").disabled=!allDone;
 }
 
+var currentCaptureSlot = null;
+
 function captureTaskPhoto(slotIdx){
+  currentCaptureSlot = slotIdx;
   var v   = document.getElementById("taskVideo");
   var ovl = document.getElementById("taskCamOverlay");
+  var hint = document.getElementById("taskPhotoHint");
+  var task = DAILY_TASKS.find(function(t){return t.id===currentTaskId;});
+  var slotLabel = task && task.photos[slotIdx] ? task.photos[slotIdx].label : "Photo "+(slotIdx+1);
+
+  // Update slot label in viewfinder
+  var labelEl = ovl.querySelector("span");
+  if(labelEl) labelEl.textContent = slotLabel;
 
   function tryCamera(constraints){
     navigator.mediaDevices.getUserMedia(constraints)
       .then(function(stream){
         taskStream = stream;
         v.srcObject = stream;
-        if(ovl) ovl.style.display = "block";
-        // Wait until video is actually playing and has real dimensions
         v.onloadedmetadata = function(){ v.play(); };
-        v.onplaying = function(){
-          // Poll until videoWidth > 0 (some browsers are lazy)
-          var attempts = 0;
-          function waitForSize(){
-            if(v.videoWidth > 0 || attempts > 20){
-              setTimeout(function(){ doTaskCapture(slotIdx); }, 300);
-            } else {
-              attempts++;
-              setTimeout(waitForSize, 100);
-            }
-          }
-          waitForSize();
-        };
+        // Show viewfinder, hide photo grid & hint
+        if(ovl){ ovl.style.display = "flex"; }
+        if(hint){ hint.style.display = "none"; }
+        document.getElementById("taskPhotoGrid").style.display = "none";
+        document.getElementById("taskSubmitBtn").style.display = "none";
       })
       .catch(function(err){
         console.warn("Camera error:", err.name, err.message);
         if(constraints.video && constraints.video.facingMode){
-          tryCamera({video:true, audio:false});
+          tryCamera({video:true, audio:false}); // fallback: any camera
         } else {
           taskPhotos[slotIdx]="no-cam"; updateSlotDone(slotIdx,null); checkTaskReady();
         }
@@ -1567,13 +1569,26 @@ function captureTaskPhoto(slotIdx){
   tryCamera({video:{facingMode:"environment"}, audio:false});
 }
 
-function doTaskCapture(slotIdx){
-  var v   = document.getElementById("taskVideo");
-  var c   = document.getElementById("taskCanvas");
-  var ovl = document.getElementById("taskCamOverlay");
-  var w   = v.videoWidth  || 640;
-  var h   = v.videoHeight || 480;
-  // Scale down for storage
+function cancelTaskCam(){
+  stopTaskCam();
+  showTaskGrid();
+}
+
+function showTaskGrid(){
+  var ovl  = document.getElementById("taskCamOverlay");
+  var hint = document.getElementById("taskPhotoHint");
+  if(ovl)  ovl.style.display  = "none";
+  if(hint) hint.style.display = "block";
+  document.getElementById("taskPhotoGrid").style.display = "";
+  document.getElementById("taskSubmitBtn").style.display = "";
+}
+
+function doTaskCapture(){
+  var slotIdx = currentCaptureSlot;
+  var v = document.getElementById("taskVideo");
+  var c = document.getElementById("taskCanvas");
+  var w = v.videoWidth  || 640;
+  var h = v.videoHeight || 480;
   var maxW = 800;
   if(w > maxW){ h = Math.round(h * maxW/w); w = maxW; }
   c.width=w; c.height=h;
@@ -1581,7 +1596,7 @@ function doTaskCapture(slotIdx){
   var dataUrl = c.toDataURL("image/jpeg", 0.55);
   taskPhotos[slotIdx] = dataUrl;
   stopTaskCam();
-  if(ovl) ovl.style.display = "none";
+  showTaskGrid();
   updateSlotDone(slotIdx, dataUrl);
   checkTaskReady();
   var fl=document.getElementById("flash"); if(fl){fl.classList.add("on");setTimeout(function(){fl.classList.remove("on");},110);}
@@ -1600,8 +1615,7 @@ function updateSlotDone(slotIdx,dataUrl){
 function stopTaskCam(){
   if(!taskStream) return;
   taskStream.getTracks().forEach(function(t){t.stop();}); taskStream=null;
-  var v=document.getElementById("taskVideo"); if(v) v.srcObject=null;
-  var ovl=document.getElementById("taskCamOverlay"); if(ovl) ovl.style.display="none";
+  var v=document.getElementById("taskVideo"); if(v){ v.srcObject=null; v.onloadedmetadata=null; v.onplaying=null; }
 }
 
 async function submitTask(){
@@ -1687,14 +1701,20 @@ tick(); setInterval(tick,1000); startAutoSync(); loadTaskState(); renderDailyTas
 
     <!-- Photo grid -->
     <div class="task-photo-grid" id="taskPhotoGrid"></div>
-    <!-- Live camera preview (shown when capturing) -->
-    <div id="taskCamOverlay" style="display:none;position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:4/3;width:100%;">
-      <video id="taskVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;"></video>
-      <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;">
-        <div style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.7);letter-spacing:2px;">CAPTURING…</div>
+    <!-- Camera viewfinder (shown when user taps a slot) -->
+    <div id="taskCamOverlay" style="display:none;flex-direction:column;gap:10px;">
+      <div style="position:relative;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:4/3;width:100%;">
+        <video id="taskVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+        <div id="taskCamSlotLabel" style="position:absolute;top:10px;left:0;right:0;text-align:center;">
+          <span style="background:rgba(0,0,0,.5);color:#fff;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;padding:3px 10px;border-radius:20px;"></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="cancelTaskCam()" style="flex:1;height:44px;border-radius:10px;border:1.5px solid var(--border2);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;">✕ Cancel</button>
+        <button onclick="doTaskCapture()" id="taskCaptureBtn" style="flex:2;height:44px;border-radius:10px;border:none;background:var(--green);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;">📷 Capture</button>
       </div>
     </div>
-    <div class="task-photo-hint">Tap each slot to take photo</div>
+    <div class="task-photo-hint" id="taskPhotoHint">Tap each slot to take photo</div>
     <button class="task-submit-btn" id="taskSubmitBtn" onclick="submitTask()" disabled>Submit Task</button>
     <div class="task-status" id="taskStatus"></div>
   </div>
