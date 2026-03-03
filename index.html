@@ -814,25 +814,24 @@ function renderDash(d){
   var tt2pct = tt2 ? Math.min(ts/tt2*100, 100) : 0;
   var tt3pct = tt3 ? Math.min(ts/tt3*100, 100) : 0;
 
-  function totalTierSimple(bId,pId,tId,bdId,cur,tgt){
+  function totalTierSimple(bId,pId,tId,bpId,bdId,cur,tgt,rate){
     var pct=tgt?Math.min(cur/tgt*100,100):0;
     document.getElementById(bId).style.width=pct+"%";
     document.getElementById(pId).textContent=tgt?pct.toFixed(0)+"%":"—";
     document.getElementById(tId).textContent=tgt?"RM "+tgt.toLocaleString():"—";
+    var bpEl=document.getElementById(bpId);
+    if(bpEl) bpEl.textContent=rate?rate+"%":"";
     setBadge(document.getElementById(bdId),cur,tgt);
   }
-  totalTierSimple("tt1Bar","tt1Pct","tt1Tgt","tt1Badge",ts,tt1);
-  totalTierSimple("tt2Bar","tt2Pct","tt2Tgt","tt2Badge",ts,tt2);
-  totalTierSimple("tt3Bar","tt3Pct","tt3Tgt","tt3Badge",ts,tt3);
-  // Hide tt BonusPct (no longer used - comm % comes from TT tiers)
-  ["tt1BonusPct","tt2BonusPct","tt3BonusPct"].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.textContent="";
-  });
+  totalTierSimple("tt1Bar","tt1Pct","tt1Tgt","tt1BonusPct","tt1Badge",ts,tt1,r1);
+  totalTierSimple("tt2Bar","tt2Pct","tt2Tgt","tt2BonusPct","tt2Badge",ts,tt2,r2);
+  totalTierSimple("tt3Bar","tt3Pct","tt3Tgt","tt3BonusPct","tt3Badge",ts,tt3,r3);
 
+  var r1=d.tt1_rate||1.0, r2=d.tt2_rate||1.5, r3=d.tt3_rate||2.0;
   var BASE=0.5, activePct=BASE, tierLabel=BASE+"% (base)";
-  if(tt3&&ts>=tt3)     {activePct=p3||1.5;tierLabel=(p3||1.5)+"% (TT3 unlocked)";}
-  else if(tt2&&ts>=tt2){activePct=p2||1.2;tierLabel=(p2||1.2)+"% (TT2 unlocked)";}
-  else if(tt1&&ts>=tt1){activePct=p1||1.0;tierLabel=(p1||1.0)+"% (TT1 unlocked)";}
+  if(tt3&&ts>=tt3)     {activePct=r3;tierLabel=r3+"% (TT3 unlocked)";}
+  else if(tt2&&ts>=tt2){activePct=r2;tierLabel=r2+"% (TT2 unlocked)";}
+  else if(tt1&&ts>=tt1){activePct=r1;tierLabel=r1+"% (TT1 unlocked)";}
   var calcComm=ts?parseFloat((ts*activePct/100).toFixed(2)):0;
   document.getElementById("overallComm").textContent=calcComm.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
   // Task reward from Sheets (col R)
