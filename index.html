@@ -342,8 +342,9 @@
   .punch-action-row{display:flex;gap:8px;}
   .punch-btn-in{flex:1;height:48px;background:var(--green);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:all .12s;}
   .punch-btn-in:active{transform:scale(.97);}
-  .punch-btn-out{flex:1;height:48px;background:var(--bg);border:1.5px solid var(--border2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer;}
-  .punch-btn-out:hover{border-color:var(--red);color:var(--red);}
+  .punch-btn-out{flex:1;height:48px;background:var(--red);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:all .12s;}
+  .punch-btn-out:active{transform:scale(.97);}
+  .punch-btn-disabled{opacity:0.2;pointer-events:none;cursor:not-allowed;}
   .capture-btn{width:100%;height:44px;background:var(--blue);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#fff;cursor:pointer;display:none;}
   .capture-btn:active{transform:scale(.97);}
   .punch-status{text-align:center;font-family:'DM Mono',monospace;font-size:13px;font-weight:600;padding:8px;border-radius:8px;display:none;}
@@ -845,7 +846,6 @@ function renderDash(d){
   }
 
   // Sync activity feed from Sheets (cross-device)
-  console.log("[Feed sync] activity_feed from Sheets:", JSON.stringify(d.activity_feed||[]));
   if(d.activity_feed && d.activity_feed.length > 0){
     var todayStr = new Date().toLocaleDateString("en-MY");
     // Populate punchState from Sheets (newest-first, so first match per employee wins)
@@ -1453,13 +1453,17 @@ function openPunchModal(name){
   var autoType = (!lastPunch || lastPunch==="OUT") ? "IN" : "OUT";
   punchType = autoType;
 
-  // Show auto-selected type, but still allow manual override
+  // Lock to auto-determined type only — no manual override
   document.getElementById("punchActionRow").style.display = "flex";
-  // Highlight the auto-selected button
-  var inBtn  = document.querySelector(".punch-btn-in");
-  var outBtn = document.querySelector(".punch-btn-out");
-  if(inBtn)  inBtn.style.opacity  = autoType==="IN"  ? "1" : "0.4";
-  if(outBtn) outBtn.style.opacity = autoType==="OUT" ? "1" : "0.4";
+  var inBtn  = document.getElementById("punchBtnIn");
+  var outBtn = document.getElementById("punchBtnOut");
+  if(autoType==="IN"){
+    if(inBtn)  { inBtn.classList.remove("punch-btn-disabled"); }
+    if(outBtn) { outBtn.classList.add("punch-btn-disabled"); }
+  } else {
+    if(outBtn) { outBtn.classList.remove("punch-btn-disabled"); }
+    if(inBtn)  { inBtn.classList.add("punch-btn-disabled"); }
+  }
 
   document.getElementById("captureBtn").style.display = "block";
   startPunchCam();
@@ -1470,13 +1474,7 @@ function closePunchModal(){
   stopPunchCam();
   punchEmp = null; punchType = null;
 }
-function punchSelect(type){
-  punchType = type;
-  var inBtn  = document.querySelector(".punch-btn-in");
-  var outBtn = document.querySelector(".punch-btn-out");
-  if(inBtn)  inBtn.style.opacity  = type==="IN"  ? "1" : "0.4";
-  if(outBtn) outBtn.style.opacity = type==="OUT" ? "1" : "0.4";
-}
+// punchSelect removed — punch type is locked, no manual override
 function startPunchCam(){
   if(punchStream) return;
   var v = document.getElementById("punchVideo");
