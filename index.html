@@ -642,8 +642,8 @@
     </div>
     <canvas id="punchCanvas" style="display:none"></canvas>
     <div class="punch-action-row" id="punchActionRow">
-      <button class="punch-btn-in" onclick="punchSelect('IN')">▶ Clock In</button>
-      <button class="punch-btn-out" onclick="punchSelect('OUT')">■ Clock Out</button>
+      <button class="punch-btn-in" id="punchBtnIn" onclick="punchSelect('IN')">▶ Clock In</button>
+      <button class="punch-btn-out" id="punchBtnOut" onclick="punchSelect('OUT')">■ Clock Out</button>
     </div>
     <div id="punchWarn" style="display:none;font-size:12px;padding:8px 10px;background:#fff3cd;border-radius:8px;margin-top:6px;color:#856404;"></div>
     <button class="capture-btn" id="captureBtn" onclick="doCapture()">📷 Capture &amp; Confirm</button>
@@ -1460,10 +1460,7 @@ function openPunchModal(name){
   // Default to auto-detected type, both buttons still clickable
   document.getElementById("punchActionRow").style.display = "flex";
   punchType = autoType;
-  var inBtn  = document.getElementById("punchBtnIn");
-  var outBtn = document.getElementById("punchBtnOut");
-  if(inBtn)  { inBtn.style.opacity  = autoType==="IN"  ? "1" : "0.3"; inBtn.style.filter  = autoType==="IN"  ? "" : "grayscale(1)"; }
-  if(outBtn) { outBtn.style.opacity = autoType==="OUT" ? "1" : "0.3"; outBtn.style.filter = autoType==="OUT" ? "" : "grayscale(1)"; }
+  setPunchButtonState(autoType);
 
   document.getElementById("captureBtn").style.display = "block";
   startPunchCam();
@@ -1483,12 +1480,22 @@ function punchSelect(type){
   applyPunchSelect(type);
 }
 
+function setPunchButtonState(activeType){
+  var inBtn  = document.getElementById("punchBtnIn")  || document.querySelector(".punch-btn-in");
+  var outBtn = document.getElementById("punchBtnOut") || document.querySelector(".punch-btn-out");
+  if(!inBtn || !outBtn) return;
+  if(activeType==="IN"){
+    inBtn.style.opacity="1";   inBtn.style.filter="";
+    outBtn.style.opacity="0.3"; outBtn.style.filter="grayscale(1)";
+  } else {
+    outBtn.style.opacity="1";  outBtn.style.filter="";
+    inBtn.style.opacity="0.3";  inBtn.style.filter="grayscale(1)";
+  }
+}
+
 function applyPunchSelect(type){
   punchType = type;
-  var inBtn  = document.getElementById("punchBtnIn");
-  var outBtn = document.getElementById("punchBtnOut");
-  if(inBtn)  { inBtn.style.opacity  = type==="IN"  ? "1" : "0.3"; inBtn.style.filter  = type==="IN"  ? "" : "grayscale(1)"; }
-  if(outBtn) { outBtn.style.opacity = type==="OUT" ? "1" : "0.3"; outBtn.style.filter = type==="OUT" ? "" : "grayscale(1)"; }
+  setPunchButtonState(type);
   // Hide warning if visible
   var w = document.getElementById("punchWarn"); if(w) w.style.display="none";
 }
