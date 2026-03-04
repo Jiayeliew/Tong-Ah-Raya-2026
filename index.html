@@ -842,6 +842,18 @@ function renderDash(d){
     saveTaskState();
     renderDailyTasks();
   }
+
+  // Sync activity feed from Sheets (cross-device)
+  if(d.activity_feed && d.activity_feed.length > 0){
+    var sheetItems = d.activity_feed.map(function(f){
+      return {name:f.name, type:f.type, time:f.time, detail:f.detail, fromSheets:true};
+    });
+    // Merge: keep local-only items (just added, not yet in Sheets), prepend Sheets items
+    var localItems = loadFeedFromStorage().filter(function(i){ return !i.fromSheets; });
+    var merged = sheetItems.concat(localItems).slice(0,100);
+    saveFeedToStorage(merged);
+    renderFeed(merged);
+  }
   // Today Earned
   var taskRew = d.task_reward || 0;
   document.getElementById("taskRewardAmt").textContent = taskRew.toFixed(0);
@@ -1390,9 +1402,50 @@ var punchEmp = null, punchType = null, punchStream = null;
 function openPunchModal(name){
   punchEmp = name; punchType = null;
   document.getElementById("punchEmpName").textContent = name;
-  document.getElementById("punchActionRow").style.display = "flex";
-  document.getElementById("captureBtn").style.display = "none";
   document.getElementById("punchStatus").style.display = "none";
+
+  // Auto-determine IN or OUT based on last punch for this employee today
+  // Cutoff: before 05:00 = treat as previous day's session
+  var now = new Date();
+  var cutoff = new Date(now); cutoff.setHours(5,0,0,0);
+  var refDate = now < cutoff
+    ? new Date(now.getFullYear(), now.getMonth(), now.getDate()-1)
+    : now;
+  var refStr = refDate.toLocaleDateString("en-MY");
+
+  var feed = loadFeedFromStorage();
+  var lastPunch = null;
+  for(var i=0; i<feed.length; i++){
+    var f=feed[i];
+    if(f.name===name && (f.type==="IN"||f.type==="OUT") && f.date===refStr){
+      lastPunch=f.type; break; // feed is newest-first
+    }
+  }
+
+  // Also check Sheets activity_feed from lastData
+  if(!lastPunch && lastData && lastData.activity_feed){
+    var af = lastData.activity_feed;
+    for(var j=0; j<af.length; j++){
+      if(af[j].name===name && (af[j].type==="IN"||af[j].type==="OUT")){
+        lastPunch=af[j].type; break;
+      }
+    }
+  }
+
+  // If last punch was IN → default OUT, else → default IN
+  var autoType = (!lastPunch || lastPunch==="OUT") ? "IN" : "OUT";
+  punchType = autoType;
+
+  // Show auto-selected type, but still allow manual override
+  document.getElementById("punchActionRow").style.display = "flex";
+  // Highlight the auto-selected button
+  var inBtn  = document.querySelector(".punch-btn-in");
+  var outBtn = document.querySelector(".punch-btn-out");
+  if(inBtn)  inBtn.style.opacity  = autoType==="IN"  ? "1" : "0.4";
+  if(outBtn) outBtn.style.opacity = autoType==="OUT" ? "1" : "0.4";
+
+  document.getElementById("captureBtn").style.display = "block";
+  startPunchCam();
   document.getElementById("punchModalBg").classList.add("open");
 }
 function closePunchModal(){
@@ -1402,9 +1455,10 @@ function closePunchModal(){
 }
 function punchSelect(type){
   punchType = type;
-  document.getElementById("punchActionRow").style.display = "none";
-  document.getElementById("captureBtn").style.display = "block";
-  startPunchCam();
+  var inBtn  = document.querySelector(".punch-btn-in");
+  var outBtn = document.querySelector(".punch-btn-out");
+  if(inBtn)  inBtn.style.opacity  = type==="IN"  ? "1" : "0.4";
+  if(outBtn) outBtn.style.opacity = type==="OUT" ? "1" : "0.4";
 }
 function startPunchCam(){
   if(punchStream) return;
@@ -1445,7 +1499,7 @@ function doCapture(){
   st.textContent = (punchType==="IN" ? "✅ Clocked In: " : "✅ Clocked Out: ") + punchEmp + " · " + ts;
   st.className = "punch-status ok"; st.style.display = "block";
   // Save to Sheets
-  addFeed(punchEmp, punchType, ts);
+  addFeed(punchEmp, punchType, ts, "", ds);
   fetch(SHEET_URL,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify({name:punchEmp,type:punchType,date:ds,time:ts})}).catch(function(){});
   // Close modal after 1.5s
@@ -1493,9 +1547,13 @@ function renderFeed(items){
   });
 }
 
-function addFeed(name, type, time, detail){
+function addFeed(name, type, time, detail, date){
+  var now=new Date();
+  var d=date||(now<new Date(now.getFullYear(),now.getMonth(),now.getDate(),5,0,0)
+    ?new Date(now.getFullYear(),now.getMonth(),now.getDate()-1).toLocaleDateString("en-MY")
+    :now.toLocaleDateString("en-MY"));
   var items=loadFeedFromStorage();
-  items.unshift({name:name,type:type,time:time,detail:detail||""});
+  items.unshift({name:name,type:type,time:time,detail:detail||"",date:d});
   if(items.length>100) items=items.slice(0,100);
   saveFeedToStorage(items);
   renderFeed(items);
