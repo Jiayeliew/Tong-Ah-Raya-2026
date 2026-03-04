@@ -345,6 +345,7 @@
   .punch-btn-out{flex:1;height:48px;background:var(--red);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:all .12s;}
   .punch-btn-out:active{transform:scale(.97);}
   .punch-btn-disabled{opacity:0.2;pointer-events:none;cursor:not-allowed;}
+  .punch-btn-dim{opacity:0.35!important;}
   .capture-btn{width:100%;height:44px;background:var(--blue);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#fff;cursor:pointer;display:none;}
   .capture-btn:active{transform:scale(.97);}
   .punch-status{text-align:center;font-family:'DM Mono',monospace;font-size:13px;font-weight:600;padding:8px;border-radius:8px;display:none;}
@@ -644,6 +645,7 @@
       <button class="punch-btn-in" onclick="punchSelect('IN')">▶ Clock In</button>
       <button class="punch-btn-out" onclick="punchSelect('OUT')">■ Clock Out</button>
     </div>
+    <div id="punchWarn" style="display:none;font-size:12px;padding:8px 10px;background:#fff3cd;border-radius:8px;margin-top:6px;color:#856404;"></div>
     <button class="capture-btn" id="captureBtn" onclick="doCapture()">📷 Capture &amp; Confirm</button>
     <div class="punch-status" id="punchStatus"></div>
   </div>
@@ -1460,8 +1462,8 @@ function openPunchModal(name){
   punchType = autoType;
   var inBtn  = document.getElementById("punchBtnIn");
   var outBtn = document.getElementById("punchBtnOut");
-  if(inBtn)  inBtn.style.opacity  = autoType==="IN"  ? "1" : "0.5";
-  if(outBtn) outBtn.style.opacity = autoType==="OUT" ? "1" : "0.5";
+  if(inBtn)  { inBtn.classList.toggle("punch-btn-dim", autoType!=="IN");  }
+  if(outBtn) { outBtn.classList.toggle("punch-btn-dim", autoType!=="OUT"); }
 
   document.getElementById("captureBtn").style.display = "block";
   startPunchCam();
@@ -1473,19 +1475,31 @@ function closePunchModal(){
   punchEmp = null; punchType = null;
 }
 function punchSelect(type){
-  // Warn if same as last punch (possible mistake)
-  if(type === punchType && punchType !== null){
-    // Already the default - no warning needed
-  } else if(window._lastPunchForEmp && type === window._lastPunchForEmp){
-    if(!confirm("⚠️ Last record for " + punchEmp + " was also " + type + ". Are you sure?")){
-      return; // cancelled
-    }
+  if(window._lastPunchForEmp && type === window._lastPunchForEmp){
+    // Show inline warning instead of browser dialog
+    showPunchWarning(type);
+    return;
   }
+  applyPunchSelect(type);
+}
+
+function applyPunchSelect(type){
   punchType = type;
   var inBtn  = document.getElementById("punchBtnIn");
   var outBtn = document.getElementById("punchBtnOut");
-  if(inBtn)  inBtn.style.opacity  = type==="IN"  ? "1" : "0.5";
-  if(outBtn) outBtn.style.opacity = type==="OUT" ? "1" : "0.5";
+  if(inBtn)  { inBtn.classList.toggle("punch-btn-dim",  type!=="IN");  }
+  if(outBtn) { outBtn.classList.toggle("punch-btn-dim", type!=="OUT"); }
+  // Hide warning if visible
+  var w = document.getElementById("punchWarn"); if(w) w.style.display="none";
+}
+
+function showPunchWarning(type){
+  var w = document.getElementById("punchWarn");
+  if(!w) return;
+  w.innerHTML = "⚠️ Last record was also <b>"+type+"</b>. &nbsp;"
+    + "<button onclick="applyPunchSelect('"+type+"')" style="background:var(--red);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer">Confirm</button>"
+    + " <button onclick="document.getElementById('punchWarn').style.display='none'" style="background:var(--border);border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer">Cancel</button>";
+  w.style.display="block";
 }
 function startPunchCam(){
   if(punchStream) return;
