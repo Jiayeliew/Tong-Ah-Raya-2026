@@ -1462,8 +1462,8 @@ function openPunchModal(name){
   punchType = autoType;
   var inBtn  = document.getElementById("punchBtnIn");
   var outBtn = document.getElementById("punchBtnOut");
-  if(inBtn)  { inBtn.classList.toggle("punch-btn-dim", autoType!=="IN");  }
-  if(outBtn) { outBtn.classList.toggle("punch-btn-dim", autoType!=="OUT"); }
+  if(inBtn)  { inBtn.style.opacity  = autoType==="IN"  ? "1" : "0.3"; inBtn.style.filter  = autoType==="IN"  ? "" : "grayscale(1)"; }
+  if(outBtn) { outBtn.style.opacity = autoType==="OUT" ? "1" : "0.3"; outBtn.style.filter = autoType==="OUT" ? "" : "grayscale(1)"; }
 
   document.getElementById("captureBtn").style.display = "block";
   startPunchCam();
@@ -1487,8 +1487,8 @@ function applyPunchSelect(type){
   punchType = type;
   var inBtn  = document.getElementById("punchBtnIn");
   var outBtn = document.getElementById("punchBtnOut");
-  if(inBtn)  { inBtn.classList.toggle("punch-btn-dim",  type!=="IN");  }
-  if(outBtn) { outBtn.classList.toggle("punch-btn-dim", type!=="OUT"); }
+  if(inBtn)  { inBtn.style.opacity  = type==="IN"  ? "1" : "0.3"; inBtn.style.filter  = type==="IN"  ? "" : "grayscale(1)"; }
+  if(outBtn) { outBtn.style.opacity = type==="OUT" ? "1" : "0.3"; outBtn.style.filter = type==="OUT" ? "" : "grayscale(1)"; }
   // Hide warning if visible
   var w = document.getElementById("punchWarn"); if(w) w.style.display="none";
 }
