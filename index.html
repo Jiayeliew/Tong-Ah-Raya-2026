@@ -645,7 +645,6 @@
       <button class="punch-btn-in" id="punchBtnIn" onclick="punchSelect('IN')">▶ Clock In</button>
       <button class="punch-btn-out" id="punchBtnOut" onclick="punchSelect('OUT')">■ Clock Out</button>
     </div>
-    <div id="punchWarn" style="display:none;font-size:12px;padding:8px 10px;background:#fff3cd;border-radius:8px;margin-top:6px;color:#856404;"></div>
     <button class="capture-btn" id="captureBtn" onclick="doCapture()">📷 Capture &amp; Confirm</button>
     <div class="punch-status" id="punchStatus"></div>
   </div>
@@ -1473,9 +1472,7 @@ function closePunchModal(){
 }
 function punchSelect(type){
   if(window._lastPunchForEmp && type === window._lastPunchForEmp){
-    // Show inline warning instead of browser dialog
-    showPunchWarning(type);
-    return;
+    showToast("⚠️ Last record for "+punchEmp+" was also "+type,"err",3000);
   }
   applyPunchSelect(type);
 }
@@ -1496,22 +1493,9 @@ function setPunchButtonState(activeType){
 function applyPunchSelect(type){
   punchType = type;
   setPunchButtonState(type);
-  // Hide warning if visible
-  var w = document.getElementById("punchWarn"); if(w) w.style.display="none";
 }
 
-function showPunchWarning(type){
-  var w = document.getElementById("punchWarn");
-  if(!w) return;
-  // Store pending type for confirm button
-  w._pendingType = type;
-  w.innerHTML = "⚠️ Last record was also <b>"+type+"</b>. &nbsp;"
-    + "<button id='punchWarnConfirm' style='background:var(--red);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer'>Confirm</button>"
-    + " <button id='punchWarnCancel' style='background:var(--border);border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer'>Cancel</button>";
-  w.style.display="block";
-  document.getElementById("punchWarnConfirm").onclick = function(){ applyPunchSelect(w._pendingType); };
-  document.getElementById("punchWarnCancel").onclick  = function(){ w.style.display="none"; };
-}
+
 function startPunchCam(){
   if(punchStream) return;
   var v = document.getElementById("punchVideo");
