@@ -1816,7 +1816,8 @@ async function submitTask(){
         body:JSON.stringify({action:"uploadTaskPhotos",task:task.id,taskLabel:task.label,
           store:(lastData&&lastData.store)||"Unknown",date:date,time:time,
           photos:photos,totalReward:totalReward})
-      }).catch(function(e){console.warn("Photo upload:",e);});
+      }).catch(function(e){console.warn("Photo upload (non-critical):",e);});
+      // Note: photo upload failure is non-critical - col R already written
     }
     var r={ok:true};
 
