@@ -645,6 +645,7 @@
       <button class="punch-btn-in" id="punchBtnIn" onclick="punchSelect('IN')">▶ Clock In</button>
       <button class="punch-btn-out" id="punchBtnOut" onclick="punchSelect('OUT')">■ Clock Out</button>
     </div>
+    <div id="punchWarn" style="display:none;font-size:12px;padding:8px 10px;background:#fff3cd;border-radius:8px;margin-top:6px;color:#856404;"></div>
     <button class="capture-btn" id="captureBtn" onclick="doCapture()">📷 Capture &amp; Confirm</button>
     <div class="punch-status" id="punchStatus"></div>
   </div>
@@ -1469,10 +1470,15 @@ function closePunchModal(){
   document.getElementById("punchModalBg").classList.remove("open");
   stopPunchCam();
   punchEmp = null; punchType = null;
+  var w=document.getElementById("punchWarn"); if(w) w.style.display="none";
 }
 function punchSelect(type){
   if(window._lastPunchForEmp && type === window._lastPunchForEmp){
-    showToast("⚠️ Last record for "+punchEmp+" was also "+type,"err",3000);
+    var w=document.getElementById("punchWarn");
+    if(w){ w.textContent="⚠️ Last record was also "+type+" — double check!"; w.style.display="block"; }
+  } else {
+    var w=document.getElementById("punchWarn");
+    if(w) w.style.display="none";
   }
   applyPunchSelect(type);
 }
