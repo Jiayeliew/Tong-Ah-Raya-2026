@@ -1452,18 +1452,16 @@ function openPunchModal(name){
   // If last punch was IN → default OUT, else → default IN
   var autoType = (!lastPunch || lastPunch==="OUT") ? "IN" : "OUT";
   punchType = autoType;
+  // Store lastPunch globally so punchSelect can access for warning
+  window._lastPunchForEmp = lastPunch;
 
-  // Lock to auto-determined type only — no manual override
+  // Default to auto-detected type, both buttons still clickable
   document.getElementById("punchActionRow").style.display = "flex";
+  punchType = autoType;
   var inBtn  = document.getElementById("punchBtnIn");
   var outBtn = document.getElementById("punchBtnOut");
-  if(autoType==="IN"){
-    if(inBtn)  { inBtn.classList.remove("punch-btn-disabled"); }
-    if(outBtn) { outBtn.classList.add("punch-btn-disabled"); }
-  } else {
-    if(outBtn) { outBtn.classList.remove("punch-btn-disabled"); }
-    if(inBtn)  { inBtn.classList.add("punch-btn-disabled"); }
-  }
+  if(inBtn)  inBtn.style.opacity  = autoType==="IN"  ? "1" : "0.5";
+  if(outBtn) outBtn.style.opacity = autoType==="OUT" ? "1" : "0.5";
 
   document.getElementById("captureBtn").style.display = "block";
   startPunchCam();
@@ -1474,7 +1472,21 @@ function closePunchModal(){
   stopPunchCam();
   punchEmp = null; punchType = null;
 }
-// punchSelect removed — punch type is locked, no manual override
+function punchSelect(type){
+  // Warn if same as last punch (possible mistake)
+  if(type === punchType && punchType !== null){
+    // Already the default - no warning needed
+  } else if(window._lastPunchForEmp && type === window._lastPunchForEmp){
+    if(!confirm("⚠️ Last record for " + punchEmp + " was also " + type + ". Are you sure?")){
+      return; // cancelled
+    }
+  }
+  punchType = type;
+  var inBtn  = document.getElementById("punchBtnIn");
+  var outBtn = document.getElementById("punchBtnOut");
+  if(inBtn)  inBtn.style.opacity  = type==="IN"  ? "1" : "0.5";
+  if(outBtn) outBtn.style.opacity = type==="OUT" ? "1" : "0.5";
+}
 function startPunchCam(){
   if(punchStream) return;
   var v = document.getElementById("punchVideo");
