@@ -676,8 +676,9 @@
 </div>
 
 <script>
-var SHEET_URL = "https://script.google.com/macros/s/AKfycbz6TwETt-lLCMNpMWe-7c5rmcgHw_F_JX2v0457n-ubGxc8kVxgF2TkNdz_BAZwrm32/exec";
+var SHEET_URL = "https://script.google.com/macros/s/AKfycbwuAR5LAOq9bmvQBSMisn9KohzpoRSKHX4DkD-3CwYqijydkdLPM4vRHtUUKqWJb6gQ/exec";
 var selEmp=null, camStream=null, syncTimer=null, lastData=null, stockData=null;
+var punchState={}; // {empName: "IN"/"OUT"} last punch type per employee today
 var t3UnlockShown=false; // only show T3 unlock popup once per session
 
 // ── Clock ──────────────────────────────────────────────────
@@ -844,8 +845,15 @@ function renderDash(d){
   }
 
   // Sync activity feed from Sheets (cross-device)
+  console.log("[Feed sync] activity_feed from Sheets:", JSON.stringify(d.activity_feed||[]));
   if(d.activity_feed && d.activity_feed.length > 0){
     var todayStr = new Date().toLocaleDateString("en-MY");
+    // Populate punchState from Sheets (newest-first, so first match per employee wins)
+    d.activity_feed.forEach(function(f){
+      if((f.type==="IN"||f.type==="OUT") && f.name && !punchState[f.name.trim()]){
+        punchState[f.name.trim()] = f.type;
+      }
+    });
     var sheetItems = d.activity_feed.map(function(f){
       return {name:f.name, type:f.type, time:f.time, detail:f.detail, fromSheets:true, date:todayStr};
     });
@@ -1416,17 +1424,21 @@ function openPunchModal(name){
 
   var lastPunch = null;
 
-  // Primary: check Sheets activity_feed (cross-device, always today's data)
-  if(lastData && lastData.activity_feed){
+  // 1. punchState: most reliable, updated immediately on each punch this session
+  if(punchState[name]) {
+    lastPunch = punchState[name];
+  }
+  // 2. Sheets activity_feed: cross-device (catches punches from other devices)
+  else if(lastData && lastData.activity_feed){
     var af = lastData.activity_feed;
     for(var j=0; j<af.length; j++){
-      if(af[j].name===name && (af[j].type==="IN"||af[j].type==="OUT")){
-        lastPunch=af[j].type; break; // activity_feed is newest-first
+      var afName = String(af[j].name||"").trim();
+      if(afName===name.trim() && (af[j].type==="IN"||af[j].type==="OUT")){
+        lastPunch=af[j].type; break;
       }
     }
   }
-
-  // Fallback: check localStorage feed (for punches done this session not yet synced)
+  // 3. localStorage feed fallback
   if(!lastPunch){
     var feed = loadFeedFromStorage();
     for(var i=0; i<feed.length; i++){
@@ -1505,7 +1517,9 @@ function doCapture(){
   st.className = "punch-status ok"; st.style.display = "block";
   // Save to Sheets
   addFeed(punchEmp, punchType, ts, "", ds);
-  // Immediately update lastData.activity_feed so next punch auto-detect is correct
+  // Update punchState immediately (most reliable cross-session tracking)
+  punchState[punchEmp] = punchType;
+  // Also update lastData.activity_feed for cross-device sync
   if(lastData){
     if(!lastData.activity_feed) lastData.activity_feed=[];
     lastData.activity_feed.unshift({type:punchType,name:punchEmp,detail:"",time:ts,sort:parseInt(ts.replace(":",""))||0});
