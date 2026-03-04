@@ -845,8 +845,9 @@ function renderDash(d){
 
   // Sync activity feed from Sheets (cross-device)
   if(d.activity_feed && d.activity_feed.length > 0){
+    var todayStr = new Date().toLocaleDateString("en-MY");
     var sheetItems = d.activity_feed.map(function(f){
-      return {name:f.name, type:f.type, time:f.time, detail:f.detail, fromSheets:true};
+      return {name:f.name, type:f.type, time:f.time, detail:f.detail, fromSheets:true, date:todayStr};
     });
     // Merge: keep local-only items (just added, not yet in Sheets), prepend Sheets items
     var localItems = loadFeedFromStorage().filter(function(i){ return !i.fromSheets; });
@@ -1413,21 +1414,25 @@ function openPunchModal(name){
     : now;
   var refStr = refDate.toLocaleDateString("en-MY");
 
-  var feed = loadFeedFromStorage();
   var lastPunch = null;
-  for(var i=0; i<feed.length; i++){
-    var f=feed[i];
-    if(f.name===name && (f.type==="IN"||f.type==="OUT") && f.date===refStr){
-      lastPunch=f.type; break; // feed is newest-first
-    }
-  }
 
-  // Also check Sheets activity_feed from lastData
-  if(!lastPunch && lastData && lastData.activity_feed){
+  // Primary: check Sheets activity_feed (cross-device, always today's data)
+  if(lastData && lastData.activity_feed){
     var af = lastData.activity_feed;
     for(var j=0; j<af.length; j++){
       if(af[j].name===name && (af[j].type==="IN"||af[j].type==="OUT")){
-        lastPunch=af[j].type; break;
+        lastPunch=af[j].type; break; // activity_feed is newest-first
+      }
+    }
+  }
+
+  // Fallback: check localStorage feed (for punches done this session not yet synced)
+  if(!lastPunch){
+    var feed = loadFeedFromStorage();
+    for(var i=0; i<feed.length; i++){
+      var f=feed[i];
+      if(f.name===name && (f.type==="IN"||f.type==="OUT")){
+        lastPunch=f.type; break;
       }
     }
   }
