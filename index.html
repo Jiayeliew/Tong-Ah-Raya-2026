@@ -128,7 +128,7 @@
   .fdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
   .fdot-in{background:var(--green);} .fdot-out{background:var(--red);}
   .fdot-foc{background:var(--blue);} .fdot-sample{background:var(--gold);} .fdot-faulty{background:#f97316;} .fdot-neutral{background:var(--muted);}
-  .fname{font-weight:600;} .ftype{font-size:10px;color:var(--muted);flex-shrink:0;}
+  .fname{font-weight:400;} .ftype{font-size:13px;color:var(--text);flex-shrink:0;font-weight:600;}
   .fdetail{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px;}
   .ftime{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0;}
   .settings-col{width:42px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:1px solid var(--border);}
@@ -848,6 +848,7 @@ function renderDash(d){
   }
 
   // Sync activity feed from Sheets (cross-device)
+  console.log("[Feed]", JSON.stringify(d.activity_feed||[]));
   if(d.activity_feed && d.activity_feed.length > 0){
     var todayStr = new Date().toLocaleDateString("en-MY");
     // Populate punchState from Sheets (newest-first, so first match per employee wins)
@@ -1154,7 +1155,7 @@ function autoCompleteStockTask(){
   }).then(function(r){return r.json();})
     .then(function(r){ if(!r.ok) showToast("Col R error: "+(r.error||"?"),"err",6000); })
     .catch(function(e){ showToast("Col R error: "+e.message,"err",6000); });
-  addFeed("📦 Stock Count Done!","task",time,"+RM"+task.reward+(allDone?" 🎉 All tasks done! +RM1 bonus":""));
+  addFeed(task.label,"task",time,"+RM"+task.reward+(allDone?" 🎉 All tasks done! +RM1 bonus":""));
   renderDailyTasks();
   showToast("📦 Stock Count Task auto-complete +RM"+task.reward,"ok");
 }
@@ -1591,7 +1592,23 @@ function renderFeed(items){
     else if(item.type==="Faulty") dotClass="fdot-faulty";
     else if(item.type==="task") dotClass="fdot-task";
     var detailHtml=item.detail?'<span class="fdetail">'+item.detail+'</span>':"";
-    el.innerHTML='<div class="fdot '+dotClass+'"></div><span class="fname">'+item.name+'</span><span class="ftype">'+item.type+'</span>'+detailHtml+'<span class="ftime">'+item.time+'</span>';
+    var isClock=(item.type==="IN"||item.type==="OUT");
+    // For tasks, use emoji + label; for clock, bold name; for actions, bold type
+    var nameHtml, typeHtml;
+    if(isClock){
+      nameHtml='<span class="fname" style="font-weight:600">'+item.name+'</span>';
+      typeHtml='<span class="ftype" style="font-weight:400;font-size:12px;color:var(--muted)">'+item.type+'</span>';
+    } else if(item.type==="task"){
+      // Find emoji from DAILY_TASKS
+      var taskObj=DAILY_TASKS.find(function(t){return t.label===item.name;});
+      var emoji=taskObj?taskObj.icon+"  ":"";
+      nameHtml='<span class="fname" style="font-weight:600">'+emoji+item.name+'</span>';
+      typeHtml='';
+    } else {
+      nameHtml='<span class="fname" style="font-weight:400">'+item.name+'</span>';
+      typeHtml='<span class="ftype" style="font-weight:600">'+item.type+'</span>';
+    }
+    el.innerHTML='<div class="fdot '+dotClass+'"></div>'+nameHtml+typeHtml+detailHtml+'<span class="ftime">'+item.time+'</span>';
     f.appendChild(el);
   });
 }
@@ -1870,9 +1887,8 @@ async function submitTask(){
 
     var msg = "✅ RM"+task.reward+" earned!";
     if(allDone) msg = "🎉 All tasks done! RM"+totalReward+" total (incl. RM1 bonus)";
-    var feedMsg = task.icon+" "+task.label+" Done!";
     var feedDetail = "+RM"+task.reward+(allDone?" 🎉 All tasks complete! +RM1 bonus":"");
-    addFeed(feedMsg,"task",time,feedDetail);
+    addFeed(task.label,"task",time,feedDetail);
     renderDailyTasks();
 
     var st=document.getElementById("taskStatus"); st.textContent=msg; st.style.display="block";
