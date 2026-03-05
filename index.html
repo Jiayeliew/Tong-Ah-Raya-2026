@@ -848,7 +848,6 @@ function renderDash(d){
   }
 
   // Sync activity feed from Sheets (cross-device)
-  console.log("[Feed]", JSON.stringify(d.activity_feed||[]));
   if(d.activity_feed && d.activity_feed.length > 0){
     var todayStr = new Date().toLocaleDateString("en-MY");
     // Populate punchState from Sheets (newest-first, so first match per employee wins)
@@ -862,7 +861,13 @@ function renderDash(d){
     });
     // Merge: keep local-only items (just added, not yet in Sheets), prepend Sheets items
     var localItems = loadFeedFromStorage().filter(function(i){ return !i.fromSheets; });
-    var merged = sheetItems.concat(localItems).slice(0,100);
+    var merged = sheetItems.concat(localItems);
+    merged.sort(function(a,b){
+      var ta=a.sort||parseInt((a.time||"00:00").replace(":",""))||0;
+      var tb=b.sort||parseInt((b.time||"00:00").replace(":",""))||0;
+      return tb-ta;
+    });
+    merged=merged.slice(0,100);
     saveFeedToStorage(merged);
     renderFeed(merged);
   }
@@ -1582,7 +1587,13 @@ function saveFeedToStorage(items){
 function renderFeed(items){
   var f=document.getElementById("feedScroll");
   f.innerHTML="";
-  items.forEach(function(item){
+  // Sort newest first by time
+  var sorted=items.slice().sort(function(a,b){
+    var ta=a.sort||parseInt((a.time||"00:00").replace(":",""))||0;
+    var tb=b.sort||parseInt((b.time||"00:00").replace(":",""))||0;
+    return tb-ta;
+  });
+  sorted.forEach(function(item){
     var el=document.createElement("div"); el.className="feed-item";
     var dotClass="fdot-neutral";
     if(item.type==="IN") dotClass="fdot-in";
@@ -1591,6 +1602,8 @@ function renderFeed(items){
     else if(item.type==="Sample") dotClass="fdot-sample";
     else if(item.type==="Faulty") dotClass="fdot-faulty";
     else if(item.type==="task") dotClass="fdot-task";
+    // Emoji map for action types
+    var typeEmoji={"IN":"","OUT":"","FOC":"🎁 ","Sample":"🍰 ","Faulty":"⚠️ "};
     var detailHtml=item.detail?'<span class="fdetail">'+item.detail+'</span>':"";
     var isClock=(item.type==="IN"||item.type==="OUT");
     // For tasks, use emoji + label; for clock, bold name; for actions, bold type
@@ -1606,7 +1619,7 @@ function renderFeed(items){
       typeHtml='';
     } else {
       nameHtml='<span class="fname" style="font-weight:400">'+item.name+'</span>';
-      typeHtml='<span class="ftype" style="font-weight:600">'+item.type+'</span>';
+      typeHtml='<span class="ftype" style="font-weight:600">'+(typeEmoji[item.type]||"")+item.type+'</span>';
     }
     el.innerHTML='<div class="fdot '+dotClass+'"></div>'+nameHtml+typeHtml+detailHtml+'<span class="ftime">'+item.time+'</span>';
     f.appendChild(el);
