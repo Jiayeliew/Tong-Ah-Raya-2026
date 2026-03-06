@@ -706,7 +706,7 @@
 </div>
 
 <script>
-var SHEET_URL = "https://script.google.com/macros/s/AKfycbwHiZFNxxe8mlLYiRYHLkia97pEzDmTg5ZE9dTfllSf6x296g4-e1NcfW0u3I2lk88o/exec";
+var SHEET_URL = "https://script.google.com/macros/s/AKfycbwyHfXLShJ5rECMqvplNe29vC-dF5g2V96rtKaIRpHDt-FuTdCIa3ua1qtwqo8rG7yQ/exec";
 var selEmp=null, camStream=null, syncTimer=null, lastData=null, stockData=null;
 var punchState={}; // {empName: "IN"/"OUT"} last punch type per employee today
 var t3UnlockShown=false; // only show T3 unlock popup once per session
@@ -1059,7 +1059,7 @@ function renderStockTable(products){
       +'<td style="text-align:center;background:#fff5f5;font-family:DM Mono,monospace;font-weight:600;font-size:13px;color:var(--red)" id="action-'+i+'">'+(p.action_total||0)+'</td>'
       +'<td style="text-align:center;background:var(--blue-bg);font-family:DM Mono,monospace;font-weight:700;color:var(--blue);font-size:14px" id="expected-'+i+'">—</td>'
       +'<td style="text-align:center"><input class="qty-input" type="number" min="0" placeholder="—" value="'+cl+'" data-idx="'+i+'" data-field="closing_cd" id="closing-'+i+'" oninput="onClosingInput(this)" style="background:var(--gold-bg);border-color:var(--gold-border);width:72px"></td>'
-      +'<td><input type="text" placeholder="Remarks if closing ≠ expected" value="'+rm+'" data-idx="'+i+'" id="remarks-'+i+'" oninput="stockProducts[parseInt(this.dataset.idx)].remarks=this.value;checkRemarks(parseInt(this.dataset.idx))" style="width:100%;min-width:120px;font-size:12px;padding:6px 8px;border:1.5px solid var(--border2);border-radius:6px;outline:none"></td>';
+      +'<td><input type="text" placeholder="Remarks if closing ≠ expected" value="'+rm+'" data-idx="'+i+'" id="remarks-'+i+'" oninput="stockProducts[parseInt(this.dataset.idx)].remarks=this.value;checkRemarks(parseInt(this.dataset.idx))" disabled style="width:100%;min-width:120px;font-size:12px;padding:6px 8px;border:1.5px solid var(--border2);border-radius:6px;outline:none;background:var(--surface2);color:var(--muted);cursor:not-allowed"></td>';
     tbody.appendChild(tr);
     recalcRow(i);
   }
@@ -1115,8 +1115,20 @@ function checkRemarks(idx){
   var expected=exEl?parseFloat(exEl.textContent)||0:0;
   var rmEl=document.getElementById("remarks-"+idx); if(!rmEl) return;
   var needRmk=(p.closing_cd!==null && p.closing_cd!==expected);
-  // Remarks always visible, highlight red border when required but empty
-  rmEl.style.borderColor=(needRmk&&!rmEl.value.trim())?"var(--red)":"var(--border2)";
+  if(needRmk){
+    rmEl.disabled=false;
+    rmEl.style.background="";
+    rmEl.style.cursor="text";
+    rmEl.style.color="";
+    rmEl.style.borderColor=(!p.remarks)?"var(--red)":"var(--border2)";
+  } else {
+    rmEl.disabled=true;
+    rmEl.value=""; p.remarks="";
+    rmEl.style.background="var(--surface2)";
+    rmEl.style.cursor="not-allowed";
+    rmEl.style.color="var(--muted)";
+    rmEl.style.borderColor="var(--border2)";
+  }
 }
 
 function updateStockProgress(){
