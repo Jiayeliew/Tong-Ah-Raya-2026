@@ -907,6 +907,7 @@ function renderDash(d){
   document.getElementById("taskRewardAmt").textContent = taskRew.toFixed(0);
   // Total Earned
   var taskTotal = d.total_task_reward || 0;
+  console.log("DEBUG total_task_reward:", d.total_task_reward, "taskTotal:", taskTotal);
   document.getElementById("taskTotalAmt").textContent = taskTotal.toFixed(0);
   document.getElementById("overallPctRow").textContent=ts?tierLabel+" × RM "+ts.toLocaleString():"—";
 }
