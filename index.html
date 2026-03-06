@@ -273,6 +273,8 @@
   .act-btn.sel.foc{background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important;transform:scale(.97);}
   .act-btn.sel.sample{background:var(--gold)!important;color:#fff!important;border-color:var(--gold)!important;transform:scale(.97);}
   .act-btn.sel.faulty{background:var(--red)!important;color:#fff!important;border-color:var(--red)!important;transform:scale(.97);}
+  .act-btn.transfer{border-color:#6c8ebf;color:#6c8ebf;background:#f0f4ff;}
+  .act-btn.sel.transfer{background:#6c8ebf!important;color:#fff!important;border-color:#6c8ebf!important;}
   /* Task Earn Chip */
   .task-earn-chip{background:linear-gradient(135deg,var(--gold-bg) 0%,#fff8e1 100%);border:1.5px solid var(--gold-border);border-radius:12px;padding:10px 12px;}
   .task-earn-row{display:flex;align-items:center;justify-content:space-around;gap:8px;}
@@ -312,6 +314,7 @@
   .action-modal-type.foc{background:var(--blue-bg);color:var(--blue);}
   .action-modal-type.sample{background:var(--gold-bg);color:var(--gold);}
   .action-modal-type.faulty{background:var(--red-bg);color:var(--red);}
+  .action-modal-type.transfer{background:#f0f4ff;color:#6c8ebf;}
   .action-field{display:flex;flex-direction:column;gap:5px;}
   .action-field label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--muted);}
   .action-field select,.action-field input[type=number],.action-field input[type=text],.action-field textarea{
@@ -496,6 +499,7 @@
           <button class="act-btn foc"    id="actFOC">📦 FOC</button>
           <button class="act-btn sample" id="actSample">🧪 Sample</button>
           <button class="act-btn faulty" id="actFaulty">⚠️ Faulty</button>
+        <button class="act-btn transfer" id="actTransfer">📦 Transfer</button>
         </div>
       </div>
     </div>
@@ -570,7 +574,29 @@
     </div>
     <div class="stock-footer">
       <div class="stock-progress">Filled: <span id="stockFilled">0</span> / <span id="stockTotal">0</span></div>
-      <button class="submit-stock-btn" id="submitStockBtn" onclick="submitStock()">Submit Stock Count</button>
+      <button class="submit-stock-btn" id="submitStockBtn" onclick="confirmStockSubmit()">Submit Stock Count</button>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5;">
+        ⚠️ Record all FOC / Sample / Faulty / Transfer actions before submitting.<br>
+        <span style="font-size:10px;">请确保所有 FOC / Sample / Faulty / Transfer 已记录后才提交。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stock Submit Confirm Modal -->
+<div id="stockConfirmBg" class="modal-bg" style="z-index:1100;">
+  <div class="modal-card" onclick="event.stopPropagation()" style="text-align:center;padding:28px 24px;">
+    <div style="font-size:32px;margin-bottom:12px">⚠️</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Ready to submit?</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
+      Make sure all FOC / Sample / Faulty / Transfer actions are recorded before submitting.
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:20px;">
+      请确保所有 FOC / Sample / Faulty / Transfer 已记录后才提交。
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeStockConfirm()" style="flex:1;height:44px;background:#fff0f0;border:1.5px solid var(--red);border-radius:10px;font-size:14px;font-weight:600;color:var(--red);cursor:pointer;">✕ Cancel</button>
+      <button onclick="closeStockConfirm();submitStock();" style="flex:1;height:44px;background:var(--green);border:none;border-radius:10px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;">✓ Confirm Stock</button>
     </div>
   </div>
 </div>
@@ -627,16 +653,6 @@
       <div class="action-cam-rec" id="actionCamRec"></div>
     </div>
     <button class="action-submit-btn" id="actionSubmitBtn" onclick="submitAction()">Submit</button>
-  </div>
-</div>
-
-<!-- Celebration Modal -->
-<div id="celebModalBg" class="modal-bg" onclick="closeCelebModal()">
-  <div class="modal-card" onclick="event.stopPropagation()" style="text-align:center;padding:32px 24px;">
-    <div id="celebEmoji" style="font-size:52px;margin-bottom:12px">🎉</div>
-    <div id="celebTitle" style="font-size:20px;font-weight:700;margin-bottom:8px;color:var(--text)"></div>
-    <div id="celebMsg" style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px;white-space:pre-line"></div>
-    <button onclick="closeCelebModal()" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 32px;font-size:15px;font-weight:600;cursor:pointer;">Let's Go! 💪</button>
   </div>
 </div>
 
@@ -931,9 +947,10 @@ function updateActionBtns(){ /* buttons always enabled */ }
 function bindActionBtns(){
   var map = [
     {id:"actClock",  type:"clock"},
-    {id:"actFOC",    type:"FOC"},
-    {id:"actSample", type:"Sample"},
-    {id:"actFaulty", type:"Faulty"}
+    {id:"actFOC",      type:"FOC"},
+    {id:"actSample",   type:"Sample"},
+    {id:"actFaulty",   type:"Faulty"},
+    {id:"actTransfer", type:"Transfer"}
   ];
   map.forEach(function(item){
     var btn = document.getElementById(item.id);
@@ -959,7 +976,7 @@ function triggerAction(type){
   // Update button highlight
   document.querySelectorAll(".act-btn").forEach(function(b){b.classList.remove("sel");});
   if(selectedAction){
-    var map={"clock":"actClock","FOC":"actFOC","Sample":"actSample","Faulty":"actFaulty"};
+    var map={"clock":"actClock","FOC":"actFOC","Sample":"actSample","Faulty":"actFaulty","Transfer":"actTransfer"};
     var el=document.getElementById(map[selectedAction]);
     if(el) el.classList.add("sel");
   }
@@ -1445,16 +1462,6 @@ var CELEB_MESSAGES = {
   }
 };
 
-function showCelebModal(key){
-  var m = CELEB_MESSAGES[key]; if(!m) return;
-  document.getElementById("celebEmoji").textContent  = m.emoji;
-  document.getElementById("celebTitle").textContent  = m.title;
-  document.getElementById("celebMsg").textContent    = m.msg;
-  document.getElementById("celebModalBg").classList.add("open");
-}
-function closeCelebModal(){
-  document.getElementById("celebModalBg").classList.remove("open");
-}
 
 function openPunchModal(name){
   punchEmp = name; punchType = null;
@@ -1798,9 +1805,20 @@ function openTaskModal(taskId){
   document.getElementById("taskModalBg").classList.add("open");
 }
 
+function confirmStockSubmit(){
+  document.getElementById("stockConfirmBg").classList.add("open");
+}
+function closeStockConfirm(){
+  document.getElementById("stockConfirmBg").classList.remove("open");
+}
+
 function closeTaskModal(){
   document.getElementById("taskModalBg").classList.remove("open");
   stopTaskCam(); currentTaskId=null; taskPhotos={};
+  // Reset modal state
+  document.getElementById("taskStatus").style.display="none";
+  var pg=document.getElementById("taskPhotoGrid"); if(pg) pg.style.display="";
+  var sb=document.getElementById("taskSubmitBtn"); if(sb) sb.style.display="";
 }
 
 function checkTaskReady(){
@@ -1958,10 +1976,7 @@ async function submitTask(){
 
     var st=document.getElementById("taskStatus"); st.textContent=msg; st.style.display="block";
     var celebKey = allDone ? "all_done" : (task.id==="morning"?"morning": task.id==="closing"?"closing":null);
-    setTimeout(function(){
-      closeTaskModal();
-      if(celebKey) showCelebModal(celebKey);
-    }, 1500);
+
   }catch(err){
     btn.disabled=false; btn.textContent="Submit Task";
     showToast("Upload failed: "+err.message,"err");
