@@ -266,7 +266,7 @@
   .act-btn-row .act-btn{flex:1;}
   .act-btn:disabled{opacity:.35;cursor:not-allowed;}
   .act-btn.clock{border-color:var(--green-border);color:var(--green);background:var(--green-bg);}
-  .act-btn.foc{border-color:var(--blue-border);color:var(--blue);background:var(--blue-bg);}
+  .act-btn.foc{border-color:#9b6fd4;color:#9b6fd4;background:#f5f0ff;}
   .act-btn.sample{border-color:var(--gold-border);color:var(--gold);background:var(--gold-bg);}
   .act-btn.faulty{border-color:var(--red-border);color:var(--red);background:var(--red-bg);}
   .act-btn.sel.clock{background:var(--green)!important;color:#fff!important;border-color:var(--green)!important;transform:scale(.97);}
@@ -311,7 +311,7 @@
   .action-modal-close:hover{background:var(--surface2);color:var(--text);}
   .action-modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
   .action-modal-type{display:inline-block;padding:3px 10px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;}
-  .action-modal-type.foc{background:var(--blue-bg);color:var(--blue);}
+  .action-modal-type.foc{background:#f5f0ff;color:#9b6fd4;}
   .action-modal-type.sample{background:var(--gold-bg);color:var(--gold);}
   .action-modal-type.faulty{background:var(--red-bg);color:var(--red);}
   .action-modal-type.transfer{background:#f0f4ff;color:#6c8ebf;}
@@ -584,8 +584,8 @@
 </div>
 
 <!-- Stock Submit Confirm Modal -->
-<div id="stockConfirmBg" class="modal-bg" style="z-index:1100;">
-  <div class="modal-card" onclick="event.stopPropagation()" style="text-align:center;padding:28px 24px;">
+<div id="stockConfirmBg" class="modal-bg" style="z-index:1100;background:rgba(0,0,0,0.55);">
+  <div class="modal-card" onclick="event.stopPropagation()" style="text-align:center;padding:28px 24px;background:#fff;border-radius:18px;max-width:340px;width:90%;margin:auto;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
     <div style="font-size:32px;margin-bottom:12px">⚠️</div>
     <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Ready to submit?</div>
     <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
@@ -864,11 +864,14 @@ function renderDash(d){
   var calcComm=ts?parseFloat((ts*activePct/100).toFixed(2)):0;
   document.getElementById("overallComm").textContent=calcComm.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
   // Task reward from Sheets (col R)
-  // Sync tasksDone from Sheets (cross-device source of truth)
-  if(d.completed_tasks && d.completed_tasks.length>0){
-    d.completed_tasks.forEach(function(t){
-      if(!tasksDone[t.taskId]) tasksDone[t.taskId]={time:t.time,reward:t.reward};
+  // Sync tasksDone — Sheets is source of truth
+  // Rebuild from Sheets so deleting a row resets the task
+  if(d.completed_tasks !== undefined){
+    var newDone={};
+    (d.completed_tasks||[]).forEach(function(t){
+      newDone[t.taskId]={time:t.time,reward:t.reward};
     });
+    tasksDone=newDone;
     saveTaskState();
     renderDailyTasks();
   }
@@ -1508,7 +1511,8 @@ function openPunchModal(name){
   var autoType = (!lastPunch || lastPunch==="OUT") ? "IN" : "OUT";
   punchType = autoType;
   // Store lastPunch globally so punchSelect can access for warning
-  window._lastPunchForEmp = lastPunch;
+  // null means no history = treat as OUT (so IN is correct, OUT gets warning)
+  window._lastPunchForEmp = lastPunch || "OUT";
 
   // Default to auto-detected type, both buttons still clickable
   document.getElementById("punchActionRow").style.display = "flex";
