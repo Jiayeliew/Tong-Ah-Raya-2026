@@ -630,6 +630,16 @@
   </div>
 </div>
 
+<!-- Celebration Modal -->
+<div id="celebModalBg" class="modal-bg" onclick="closeCelebModal()">
+  <div class="modal-card" onclick="event.stopPropagation()" style="text-align:center;padding:32px 24px;">
+    <div id="celebEmoji" style="font-size:52px;margin-bottom:12px">🎉</div>
+    <div id="celebTitle" style="font-size:20px;font-weight:700;margin-bottom:8px;color:var(--text)"></div>
+    <div id="celebMsg" style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px;white-space:pre-line"></div>
+    <button onclick="closeCelebModal()" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 32px;font-size:15px;font-weight:600;cursor:pointer;">Let's Go! 💪</button>
+  </div>
+</div>
+
 <!-- Punch Modal -->
 <div class="punch-modal-bg" id="punchModalBg">
   <div class="punch-modal">
@@ -850,13 +860,14 @@ function renderDash(d){
   // Sync activity feed from Sheets (cross-device)
   if(d.activity_feed && d.activity_feed.length > 0){
     var todayStr = new Date().toLocaleDateString("en-MY");
-    // Populate punchState from Sheets (newest-first, so first match per employee wins)
+    // Populate punchState from Sheets - include yesterday items for state detection
     d.activity_feed.forEach(function(f){
       if((f.type==="IN"||f.type==="OUT") && f.name && !punchState[f.name.trim()]){
         punchState[f.name.trim()] = f.type;
       }
     });
-    var sheetItems = d.activity_feed.map(function(f){
+    // Only show today's items in feed (exclude yesterday marker items)
+    var sheetItems = d.activity_feed.filter(function(f){ return !f.lastClock; }).map(function(f){
       return {name:f.name, type:f.type, time:f.time, detail:f.detail, fromSheets:true, date:todayStr};
     });
     // Merge: keep local-only items (just added, not yet in Sheets), prepend Sheets items
@@ -1416,6 +1427,35 @@ async function submitAction(){
 // ── Punch Modal ────────────────────────────────────────────
 var punchEmp = null, punchType = null, punchStream = null;
 
+var CELEB_MESSAGES = {
+  "morning": {
+    emoji: "🌅",
+    title: "Morning Setup Complete! ✅",
+    msg: "Let's have a great day ahead! 💪\n今天也要加油！✨"
+  },
+  "closing": {
+    emoji: "🌙",
+    title: "Closing Complete! ✅",
+    msg: "Thank you for your hard work today! 🙏\n辛苦了，謝謝你的付出！"
+  },
+  "all_done": {
+    emoji: "🏆",
+    title: "All Tasks Done! 🎉",
+    msg: "All tasks done! RM1 bonus unlocked! 🎉\n全部完成！RM1 bonus 到手！"
+  }
+};
+
+function showCelebModal(key){
+  var m = CELEB_MESSAGES[key]; if(!m) return;
+  document.getElementById("celebEmoji").textContent  = m.emoji;
+  document.getElementById("celebTitle").textContent  = m.title;
+  document.getElementById("celebMsg").textContent    = m.msg;
+  document.getElementById("celebModalBg").classList.add("open");
+}
+function closeCelebModal(){
+  document.getElementById("celebModalBg").classList.remove("open");
+}
+
 function openPunchModal(name){
   punchEmp = name; punchType = null;
   document.getElementById("punchEmpName").textContent = name;
@@ -1898,6 +1938,18 @@ async function submitTask(){
     tasksDone[task.id]={time:time,reward:task.reward};
     saveTaskState();
 
+    // If all tasks done, write bonus row to DAILY_TASK + update col R
+    if(allDone && !tasksDone["all_done_bonus"]){
+      tasksDone["all_done_bonus"]={time:time,reward:1};
+      saveTaskState();
+      fetch(SHEET_URL,{method:"POST",redirect:"follow",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify({action:"updateTaskReward",
+          store:(lastData&&lastData.store)||"Unknown",date:date,time:time,
+          totalReward:totalReward,taskId:"all_done_bonus",taskLabel:"All Tasks Complete",reward:1})
+      }).catch(function(e){console.warn("Bonus write error:",e);});
+    }
+
     var msg = "✅ RM"+task.reward+" earned!";
     if(allDone) msg = "🎉 All tasks done! RM"+totalReward+" total (incl. RM1 bonus)";
     var feedDetail = "+RM"+task.reward+(allDone?" 🎉 All tasks complete! +RM1 bonus":"");
@@ -1905,7 +1957,11 @@ async function submitTask(){
     renderDailyTasks();
 
     var st=document.getElementById("taskStatus"); st.textContent=msg; st.style.display="block";
-    setTimeout(closeTaskModal,1500);
+    var celebKey = allDone ? "all_done" : (task.id==="morning"?"morning": task.id==="closing"?"closing":null);
+    setTimeout(function(){
+      closeTaskModal();
+      if(celebKey) showCelebModal(celebKey);
+    }, 1500);
   }catch(err){
     btn.disabled=false; btn.textContent="Submit Task";
     showToast("Upload failed: "+err.message,"err");
