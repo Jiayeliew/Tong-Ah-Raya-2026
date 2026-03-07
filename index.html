@@ -437,9 +437,9 @@
     <div class="panel panel-daily" id="dailyCard">
       <div class="panel-head">
         <div>
-          <div class="sec-label">Today's Sales</div>
+          <div class="sec-label" style="display:flex;align-items:center;gap:6px;">Today's Sales <button id="eyeDaily" onclick="toggleSalesVis()" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0;line-height:1;color:var(--muted);">👁</button></div>
           <div class="sales-row">
-            <div class="big-num"><span class="cur">RM</span><span class="amt" id="dailyAmt">—</span></div>
+            <div class="big-num"><span class="cur">RM</span><span class="amt" id="dailyAmt" data-masked="true">——</span></div>
             <button class="update-btn" onclick="openUpdateModal()">✎ Update</button>
           </div>
         </div>
@@ -465,7 +465,7 @@
       <div class="panel-head">
         <div>
           <div class="sec-label">Total Sales</div>
-          <div class="big-num"><span class="cur blue">RM</span><span class="amt" id="totalAmt">—</span></div>
+          <div class="big-num"><span class="cur blue">RM</span><span class="amt" id="totalAmt" data-masked="true">——</span></div>
         </div>
         <div class="overall-chip">
           <div class="sec-label">Overall Comm</div>
@@ -706,7 +706,7 @@
 </div>
 
 <script>
-var SHEET_URL = "https://script.google.com/macros/s/AKfycbxxROBRExQkjJIyEtU2fGRuq_HHLnmxyljslE_173A-QzKhbIT1ulWIfsKco-yMv1fd/exec";
+var SHEET_URL = "https://script.google.com/macros/s/AKfycbwHiZFNxxe8mlLYiRYHLkia97pEzDmTg5ZE9dTfllSf6x296g4-e1NcfW0u3I2lk88o/exec";
 var selEmp=null, camStream=null, syncTimer=null, lastData=null, stockData=null;
 var punchState={}; // {empName: "IN"/"OUT"} last punch type per employee today
 var t3UnlockShown=false; // only show T3 unlock popup once per session
@@ -761,6 +761,35 @@ function setBadge(el,cur,tgt){
   else            {var gap=tgt-cur;el.textContent=gap>=1000?"RM "+(gap/1000).toFixed(1)+"k":"RM "+gap.toLocaleString();el.className="badge bm";}
 }
 
+
+var salesVisible = false;
+var salesHideTimer = null;
+var salesRealDaily = 0, salesRealTotal = 0;
+
+function toggleSalesVis(){
+  if(salesHideTimer){ clearTimeout(salesHideTimer); salesHideTimer=null; }
+  salesVisible = !salesVisible;
+  updateSalesMask();
+  if(salesVisible){
+    salesHideTimer = setTimeout(function(){ salesVisible=false; updateSalesMask(); }, 3000);
+  }
+}
+
+function updateSalesMask(){
+  var dailyEl = document.getElementById("dailyAmt");
+  var totalEl = document.getElementById("totalAmt");
+  var eyeEl   = document.getElementById("eyeDaily");
+  if(salesVisible){
+    dailyEl.textContent = salesRealDaily.toLocaleString();
+    totalEl.textContent = salesRealTotal.toLocaleString();
+    if(eyeEl) eyeEl.textContent = "🙈";
+  } else {
+    dailyEl.textContent = "——";
+    totalEl.textContent = "——";
+    if(eyeEl) eyeEl.textContent = "👁";
+  }
+}
+
 function renderDash(d){
   lastData=d;
   var ds=d.daily_sales||0, ts=d.total_sales||0;  // C col already includes today
@@ -770,8 +799,8 @@ function renderDash(d){
   // TT% calculated frontend from total_sales vs TT targets (not from Sheets)
   var p1=d.tt1_pct||0,p2=d.tt2_pct||0,p3=d.tt3_pct||0; // keep for comm calc fallback
 
-  animN(document.getElementById("dailyAmt"),ds);
-  animN(document.getElementById("totalAmt"),ts);
+  salesRealDaily = ds; salesRealTotal = ts;
+  updateSalesMask(); // respect mask state
 
   function dailyTier(bId,pId,tId,boId,bdId,cur,tgt,bonus){
     var pct=tgt?Math.min(cur/tgt*100,100):0;
@@ -1976,16 +2005,22 @@ async function submitTask(){
         totalReward:totalReward,taskId:task.id,taskLabel:task.label,reward:task.reward})});
     var rr=await rewardResp.json();
     if(!rr.ok) throw new Error(rr.error||"Col R write failed");
-    // Step 2: Upload photos async (non-blocking)
+    // Step 2: Upload photos (blocking — wait before celebration)
     var hasPhotos=photos.some(function(p){return p.data&&p.data!="no-cam"&&p.data!="";});
+    console.log("DEBUG photos:", photos.map(function(p){return p.label+":"+(p.data?p.data.substring(0,30):"EMPTY");}), "hasPhotos:", hasPhotos);
     if(hasPhotos){
-      fetch(SHEET_URL,{method:"POST",redirect:"follow",
-        headers:{"Content-Type":"text/plain;charset=utf-8"},
-        body:JSON.stringify({action:"uploadTaskPhotos",task:task.id,taskLabel:task.label,
-          store:(lastData&&lastData.store)||"Unknown",date:date,time:time,
-          photos:photos,totalReward:totalReward})
-      }).catch(function(e){console.warn("Photo upload (non-critical):",e);});
-      // Note: photo upload failure is non-critical - col R already written
+      btn.textContent="Uploading photos…";
+      try{
+        var upResp=await fetch(SHEET_URL,{method:"POST",redirect:"follow",
+          headers:{"Content-Type":"text/plain;charset=utf-8"},
+          body:JSON.stringify({action:"uploadTaskPhotos",task:task.id,taskLabel:task.label,
+            store:(lastData&&lastData.store)||"Unknown",date:date,time:time,
+            photos:photos,totalReward:totalReward})});
+        var upR=await upResp.json();
+        if(!upR.ok) console.warn("Photo upload warning:",upR.error);
+      }catch(upErr){
+        console.warn("Photo upload failed (non-critical):",upErr.message);
+      }
     }
     var r={ok:true};
 
