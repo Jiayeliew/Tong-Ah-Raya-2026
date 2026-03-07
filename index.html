@@ -2012,13 +2012,9 @@ async function submitTask(){
 
     var celebKey = allDone ? "all_done" : (CELEBS[task.id] ? task.id : null);
     btn.disabled=false; btn.textContent="Submit Task";
-    document.getElementById("taskPhotoGrid").style.display="none";
-    btn.style.display="none";
-    // Close task modal, then show celebration
-    setTimeout(function(){
-      closeTaskModal();
-      if(celebKey) showCelebration(celebKey);
-    }, 400);
+    // Close modal immediately, no flash
+    closeTaskModal();
+    if(celebKey) showCelebration(celebKey);
 
   }catch(err){
     btn.disabled=false; btn.textContent="Submit Task";
