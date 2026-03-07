@@ -1742,14 +1742,10 @@ var tasksDone    = {};
 var lastTaskDate = new Date().toDateString();
 
 function loadTaskState(){
-  try{
-    var key="tasks_"+new Date().toLocaleDateString("en-MY");
-    var raw=localStorage.getItem(key); if(raw) tasksDone=JSON.parse(raw);
-    Object.keys(localStorage).forEach(function(k){ if(k.startsWith("tasks_")&&k!==key) localStorage.removeItem(k); });
-  }catch(e){ tasksDone={}; }
+  // tasksDone rebuilt from Sheets on every sync — no localStorage read
 }
 function saveTaskState(){
-  try{ localStorage.setItem("tasks_"+new Date().toLocaleDateString("en-MY"), JSON.stringify(tasksDone)); }catch(e){}
+  // tasksDone is in-memory only; Sheets (DAILY_TASK tab) is source of truth
 }
 
 function renderDailyTasks(){
@@ -1934,22 +1930,26 @@ function stopTaskCam(){
 
 var CELEBS = {
   "morning": {
-    emoji: "\uD83C\uDF05",
-    title: "Morning Setup Complete! \u2705",
-    msg: "Let\'s have a great day ahead! \uD83D\uDCAA\n\u4ECA\u5929\u4E5F\u8981\u52A0\u6CB9\uFF01\u2728"
+    emoji: "🌅",
+    title: "Morning Setup Complete! ✅",
+    msg: "Let's have a great day ahead! 💪\n今天也要加油！✨"
+  },
+  "midday": {
+    emoji: "☀️",
+    title: "Midday Check Done! ✅",
+    msg: "Keep it up, you're doing great! 👍\n繼續加油，做得很好！💪"
   },
   "closing": {
-    emoji: "\uD83C\uDF19",
-    title: "Closing Complete! \u2705",
-    msg: "Thank you for your hard work today! \uD83D\uDE4F\n\u8F9B\u82E6\u4E86\uFF0C\u8B1D\u8B1D\u4F60\u7684\u4ED8\u51FA\uFF01"
+    emoji: "🌙",
+    title: "Closing Complete! ✅",
+    msg: "Thank you for your hard work today! 🙏\n辛苦了，謝謝你的付出！"
   },
   "all_done": {
-    emoji: "\uD83C\uDFC6",
-    title: "All Tasks Done! \uD83C\uDF89",
-    msg: "All tasks done! RM1 bonus unlocked! \uD83C\uDF89\n\u5168\u90E8\u5B8C\u6210\uFF01RM1 bonus \u5230\u624B\uFF01"
+    emoji: "🏆",
+    title: "All Tasks Done! 🎉",
+    msg: "All tasks done! RM1 bonus unlocked! 🎉\n全部完成！RM1 bonus 到手！"
   }
 };
-
 function showCelebration(key){
   var data = CELEBS[key]; if(!data) return;
   var modal = document.getElementById("taskCelebModal");
@@ -2021,7 +2021,7 @@ async function submitTask(){
     renderDailyTasks();
 
     var st=document.getElementById("taskStatus"); st.textContent=msg; st.style.display="block";
-    var celebKey = allDone ? "all_done" : (task.id==="morning"?"morning": task.id==="closing"?"closing":null);
+    var celebKey = allDone ? "all_done" : (CELEBS[task.id] ? task.id : null);
     btn.disabled=false; btn.textContent="Submit Task";
     document.getElementById("taskPhotoGrid").style.display="none";
     btn.style.display="none";
