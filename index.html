@@ -694,7 +694,7 @@
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <div class="modal-title">Connect Google Sheets</div>
-    <div class="fg"><div class="fl">Apps Script URL</div><input id="s_url" type="text" placeholder="https://script.google.com/macros/s/AKfycbwuAR5LAOq9bmvQBSMisn9KohzpoRSKHX4DkD-3CwYqijydkdLPM4vRHtUUKqWJb6gQ/exec"></div>
+    <div class="fg"><div class="fl">Apps Script URL</div><input id="s_url" type="text" placeholder="https://script.google.com/macros/s/AKfycbwHiZFNxxe8mlLYiRYHLkia97pEzDmTg5ZE9dTfllSf6x296g4-e1NcfW0u3I2lk88o/exec"></div>
 
     <div class="status-box" id="statusBox">Paste your URL and click Test</div>
     <div class="ma">
@@ -1932,6 +1932,16 @@ function stopTaskCam(){
   var v=document.getElementById("taskVideo"); if(v){ v.srcObject=null; v.onloadedmetadata=null; v.onplaying=null; }
 }
 
+function showCelebration(key){
+  var data = CELEBS[key]; if(!data) return;
+  var modal = document.getElementById("taskCelebModal");
+  document.getElementById("celebEmoji").textContent = data.emoji;
+  document.getElementById("celebTitle").textContent = data.title;
+  document.getElementById("celebMsg").textContent = data.msg;
+  modal.style.display = "flex";
+  setTimeout(function(){ modal.style.display = "none"; }, 3500);
+}
+
 async function submitTask(){
   var task=DAILY_TASKS.find(function(t){return t.id===currentTaskId;}); if(!task) return;
   var btn=document.getElementById("taskSubmitBtn");
@@ -1994,6 +2004,10 @@ async function submitTask(){
 
     var st=document.getElementById("taskStatus"); st.textContent=msg; st.style.display="block";
     var celebKey = allDone ? "all_done" : (task.id==="morning"?"morning": task.id==="closing"?"closing":null);
+    btn.disabled=false; btn.textContent="Submit Task";
+    document.getElementById("taskPhotoGrid").style.display="none";
+    btn.style.display="none";
+    if(celebKey) showCelebration(celebKey);
 
   }catch(err){
     btn.disabled=false; btn.textContent="Submit Task";
@@ -2062,5 +2076,17 @@ tick(); setInterval(tick,1000); startAutoSync(); loadTaskState(); renderDailyTas
 </div>
 <!-- Camera for task photos (hidden) -->
 <canvas id="taskCanvas" style="display:none;"></canvas>
+
+<!-- ── Celebration Modal ─────────────────────────────── -->
+<div id="taskCelebModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:36px 32px;text-align:center;max-width:320px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,0.25);animation:popIn 0.3s ease">
+    <div id="celebEmoji" style="font-size:56px;margin-bottom:8px"></div>
+    <div id="celebTitle" style="font-size:20px;font-weight:700;color:#2d2d2d;margin-bottom:10px"></div>
+    <div id="celebMsg" style="font-size:14px;color:#555;white-space:pre-line;line-height:1.6"></div>
+  </div>
+</div>
+<style>
+@keyframes popIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+</style>
 </body>
 </html>
