@@ -437,9 +437,9 @@
     <div class="panel panel-daily" id="dailyCard">
       <div class="panel-head">
         <div>
-          <div class="sec-label" style="display:flex;align-items:center;gap:6px;">Today's Sales <button id="eyeDaily" onclick="toggleSalesVis()" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0;line-height:1;color:var(--muted);">👁</button></div>
+          <div class="sec-label">Today's Sales</div>
           <div class="sales-row">
-            <div class="big-num"><span class="cur">RM</span><span class="amt" id="dailyAmt" data-masked="true">——</span></div>
+            <div class="big-num"><span class="cur">RM</span><span class="amt" id="dailyAmt" onclick="toggleSalesVis()" style="cursor:pointer;" title="Tap to reveal">–&thinsp;–</span></div>
             <button class="update-btn" onclick="openUpdateModal()">✎ Update</button>
           </div>
         </div>
@@ -465,7 +465,7 @@
       <div class="panel-head">
         <div>
           <div class="sec-label">Total Sales</div>
-          <div class="big-num"><span class="cur blue">RM</span><span class="amt" id="totalAmt" data-masked="true">——</span></div>
+          <div class="big-num"><span class="cur blue">RM</span><span class="amt" id="totalAmt" onclick="toggleSalesVis()" style="cursor:pointer;" title="Tap to reveal">–&thinsp;–</span></div>
         </div>
         <div class="overall-chip">
           <div class="sec-label">Overall Comm</div>
@@ -778,15 +778,14 @@ function toggleSalesVis(){
 function updateSalesMask(){
   var dailyEl = document.getElementById("dailyAmt");
   var totalEl = document.getElementById("totalAmt");
-  var eyeEl   = document.getElementById("eyeDaily");
+
   if(salesVisible){
     dailyEl.textContent = salesRealDaily.toLocaleString();
     totalEl.textContent = salesRealTotal.toLocaleString();
-    if(eyeEl) eyeEl.textContent = "🙈";
+
   } else {
-    dailyEl.textContent = "——";
-    totalEl.textContent = "——";
-    if(eyeEl) eyeEl.textContent = "👁";
+    dailyEl.innerHTML = "–&thinsp;–";
+    totalEl.innerHTML = "–&thinsp;–";
   }
 }
 
