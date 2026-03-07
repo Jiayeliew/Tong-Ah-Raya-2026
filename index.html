@@ -1932,6 +1932,24 @@ function stopTaskCam(){
   var v=document.getElementById("taskVideo"); if(v){ v.srcObject=null; v.onloadedmetadata=null; v.onplaying=null; }
 }
 
+var CELEBS = {
+  "morning": {
+    emoji: "\uD83C\uDF05",
+    title: "Morning Setup Complete! \u2705",
+    msg: "Let\'s have a great day ahead! \uD83D\uDCAA\n\u4ECA\u5929\u4E5F\u8981\u52A0\u6CB9\uFF01\u2728"
+  },
+  "closing": {
+    emoji: "\uD83C\uDF19",
+    title: "Closing Complete! \u2705",
+    msg: "Thank you for your hard work today! \uD83D\uDE4F\n\u8F9B\u82E6\u4E86\uFF0C\u8B1D\u8B1D\u4F60\u7684\u4ED8\u51FA\uFF01"
+  },
+  "all_done": {
+    emoji: "\uD83C\uDFC6",
+    title: "All Tasks Done! \uD83C\uDF89",
+    msg: "All tasks done! RM1 bonus unlocked! \uD83C\uDF89\n\u5168\u90E8\u5B8C\u6210\uFF01RM1 bonus \u5230\u624B\uFF01"
+  }
+};
+
 function showCelebration(key){
   var data = CELEBS[key]; if(!data) return;
   var modal = document.getElementById("taskCelebModal");
