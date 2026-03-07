@@ -694,7 +694,7 @@
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <div class="modal-title">Connect Google Sheets</div>
-    <div class="fg"><div class="fl">Apps Script URL</div><input id="s_url" type="text" placeholder="https://script.google.com/macros/s/AKfycbwHiZFNxxe8mlLYiRYHLkia97pEzDmTg5ZE9dTfllSf6x296g4-e1NcfW0u3I2lk88o/exec"></div>
+    <div class="fg"><div class="fl">Apps Script URL</div><input id="s_url" type="text" placeholder="https://script.google.com/macros/s/AKfycbw7nj4Ql25s7XY5tMI_YRL2XsPxAr5jqP1kg7fxv-9aBmOi2fo3yxB--xTfAjVxb6TK/exec"></div>
 
     <div class="status-box" id="statusBox">Paste your URL and click Test</div>
     <div class="ma">
@@ -1216,7 +1216,13 @@ async function submitStock(){
 function autoCompleteStockTask(){
   var task=DAILY_TASKS.find(function(t){return t.id==="stockcount";});
   if(!task||tasksDone["stockcount"]) return;
+  // Only complete if submitted at or after 9:30pm
   var now=new Date();
+  var hour=now.getHours(), min=now.getMinutes();
+  if(hour < 21 || (hour === 21 && min < 30)){
+    showToast("Stock Count saved ✓ — task completes after 9:30pm","ok",3000);
+    return;
+  }
   var time=now.toLocaleTimeString("en-MY",{hour12:false,hour:"2-digit",minute:"2-digit"});
   var date=now.toLocaleDateString("en-MY");
   tasksDone["stockcount"]={time:time,reward:task.reward};
