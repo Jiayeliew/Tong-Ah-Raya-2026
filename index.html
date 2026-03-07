@@ -1632,21 +1632,11 @@ function doAction(type){ if(punchEmp) doCapture(); }
 function getTodayKey(){ return "feed_"+new Date().toLocaleDateString("en-MY"); }
 
 function loadFeedFromStorage(){
-  try{
-    var key=getTodayKey();
-    var raw=localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : [];
-  }catch(e){ return []; }
+  return []; // feed from Sheets only
 }
 
 function saveFeedToStorage(items){
-  try{
-    // Clear yesterday keys
-    Object.keys(localStorage).forEach(function(k){
-      if(k.startsWith("feed_") && k!==getTodayKey()) localStorage.removeItem(k);
-    });
-    localStorage.setItem(getTodayKey(), JSON.stringify(items));
-  }catch(e){}
+  // feed is Sheets-authoritative, no localStorage
 }
 
 function renderFeed(items){
@@ -2020,7 +2010,6 @@ async function submitTask(){
     addFeed(task.label,"task",time,feedDetail);
     renderDailyTasks();
 
-    var st=document.getElementById("taskStatus"); st.textContent=msg; st.style.display="block";
     var celebKey = allDone ? "all_done" : (CELEBS[task.id] ? task.id : null);
     btn.disabled=false; btn.textContent="Submit Task";
     document.getElementById("taskPhotoGrid").style.display="none";
@@ -2062,6 +2051,8 @@ async function testConn(){
 }
 function saveSettings(){SHEET_URL=document.getElementById("s_url").value.trim();closeModal();startAutoSync();showToast("Saved","ok");}
 
+// Clear legacy localStorage on load
+try{Object.keys(localStorage).forEach(function(k){if(k.startsWith("feed_")||k.startsWith("tasks_"))localStorage.removeItem(k);});}catch(e){}
 tick(); setInterval(tick,1000); startAutoSync(); loadTaskState(); renderDailyTasks(); updateActionBtns(); bindActionBtns(); initFeed();
 </script>
 <!-- ════ Daily Task Modal ════ -->
